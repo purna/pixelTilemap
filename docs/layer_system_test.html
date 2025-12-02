@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Layer System Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-area { 
+            border: 2px solid #333; 
+            width: 200px; 
+            height: 200px; 
+            margin: 20px 0;
+            position: relative;
+        }
+        .info { 
+            background: #f0f0f0; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <h1>Layer System Integration Fix</h1>
+    <div class="info success">
+        <h3>✅ Layer System Issues Fixed:</h3>
+        <p><strong>Root Cause:</strong> The layer system was implemented in UI/data but not integrated with the actual drawing functionality.</p>
+        <p>The drawing system was drawing directly to the main editor canvas instead of using individual layer canvases.</p>
+    </div>
+
+    <div class="info">
+        <h3>🔧 Fixes Applied:</h3>
+        <ol>
+            <li><strong>Drawing Integration:</strong> Modified drawing to target active layer's canvas instead of main editor canvas</li>
+            <li><strong>Layer Compositing:</strong> Updated preview system to composite all visible layers with proper opacity</li>
+            <li><strong>Visibility System:</strong> Layer visibility now properly affects what's displayed</li>
+            <li><strong>Layer Management:</strong> Add/remove/rename operations now work with actual layer content</li>
+            <li><strong>Preview Updates:</strong> Previews refresh automatically when layer state changes</li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h3>🧪 Test Instructions:</h3>
+        <ol>
+            <li>Open the main application (index.html)</li>
+            <li>Draw something on the canvas</li>
+            <li>Add a new layer using the Layers panel</li>
+            <li>Draw something different on the new active layer</li>
+            <li>Test visibility toggle (eye icon) - layer should hide/show</li>
+            <li>Test layer deletion - content should be removed</li>
+            <li>Test double-click renaming - should allow editing layer names</li>
+            <li>Test layer switching - should switch drawing to different layer</li>
+        </ol>
+    </div>
+
+    <div class="info warning">
+        <h3>⚠️ Expected Behavior Now:</h3>
+        <ul>
+            <li><strong>Drawing:</strong> Happens on the currently active layer</li>
+            <li><strong>Visibility:</strong> Eye icon toggles layer visibility in real-time</li>
+            <li><strong>Deletion:</strong> Removes both the layer and its content</li>
+            <li><strong>Renaming:</strong> Double-click layer name to edit</li>
+            <li><strong>Layer Switching:</strong> Click layer to make it active for drawing</li>
+            <li><strong>Preview:</strong> Shows composite of all visible layers</li>
+        </ul>
+    </div>
+
+    <div class="info">
+        <h3>📋 Technical Changes:</h3>
+        <p><strong>js/tilemap-core.js:</strong></p>
+        <ul>
+            <li>Drawing now targets active layer canvas</li>
+            <li>Preview system composites all visible layers</li>
+        </ul>
+        <p><strong>js/state.js:</strong></p>
+        <ul>
+            <li>Added preview updates to layer operations</li>
+            <li>toggleLayerVisibility(), removeLayer(), addLayer(), setActiveLayer()</li>
+        </ul>
+        <p><strong>js/dom.js:</strong></p>
+        <ul>
+            <li>Fixed double-click handler for layer renaming</li>
+        </ul>
+    </div>
+</body>
+</html>

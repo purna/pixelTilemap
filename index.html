@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seamless Tilemap Editor Pro</title>
+    <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/tilemap-styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="logo-area">
+            <h1>Tilemap Editor</h1>
+            <span class="badge">Seamless Pro V1.0</span>
+        </div>
+
+        <div class="header-controls">
+            <button id="undoBtn" class="btn icon-only" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+            <button id="redoBtn" class="btn icon-only" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+
+            <div class="separator" style="height: 20px; width: 1px; margin: 0 10px;"></div>
+
+            <div class="zoom-controls-header">
+                <button id="zoomOutBtn" class="btn icon-only" title="Zoom Out (Ctrl/-)"><i
+                        class="fas fa-minus"></i></button>
+                <span id="zoomDisplay" class="zoom-display">1x</span>
+                <button id="zoomInBtn" class="btn icon-only" title="Zoom In (Ctrl/+)"><i
+                        class="fas fa-plus"></i></button>
+                <button id="zoomResetBtn" class="btn icon-only" title="Reset Zoom (0)"><i
+                        class="fas fa-compress-arrows-alt"></i></button>
+            </div>
+
+            <div class="separator" style="height: 20px; width: 1px; margin: 0 10px;"></div>
+
+            <button id="saveBtn" class="btn primary"><i class="fas fa-save"></i> Save</button>
+            <button id="loadBtn" class="btn"><i class="fas fa-folder-open"></i> Load</button>
+            <button id="exportBtn" class="btn"><i class="fas fa-file-export"></i> Export</button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+
+        <!-- LEFT TOOLBAR -->
+        <aside class="toolbar" id="tool-buttons">
+            <button class="tool-btn active" data-tool="pencil" title="Pencil (P)">
+                <i class="fas fa-pencil-alt"></i>
+                <span>Pencil</span>
+            </button>
+            <button class="tool-btn" data-tool="brush" title="Brush (B)">
+                <i class="fas fa-paint-brush"></i>
+                <span>Brush</span>
+            </button>
+            <button class="tool-btn" data-tool="eraser" title="Eraser (E)">
+                <i class="fas fa-eraser"></i>
+                <span>Eraser</span>
+            </button>
+            <div class="separator"></div>
+            <button class="tool-btn" data-tool="eyedropper" title="Color Picker (I)">
+                <i class="fas fa-eye-dropper"></i>
+                <span>Picker</span>
+            </button>
+            <div class="separator"></div>
+            <button class="tool-btn" id="layersBtn" title="Layers (L)">
+                <i class="fas fa-layer-group"></i>
+                <span>Layers</span>
+            </button>
+            <div class="toolbar-spacer"></div>
+
+            
+            <button class="canvas-btn" id="canvasBtn" title="Canvas">
+                <i class="fas fa-layer-group"></i>
+                <span>Canvas</span>
+            </button>
+            <div class="separator"></div>
+            <button class="tool-btn" id="settingsBtn" title="Settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </button>
+        </aside>
+
+        <!-- CENTER WORKSPACE -->
+        <div class="workspace">
+            <div class="controls-container">
+                <h1>Seamless Tile Editor</h1>
+            </div>
+
+            <div class="tile-grid-container">
+                <div class="tile-grid">
+                    <!-- The 3x3 canvas grid -->
+                    <!-- Row 1 -->
+                    <canvas id="preview-0-0" width="512" height="512"></canvas>
+                    <canvas id="preview-0-1" width="512" height="512"></canvas>
+                    <canvas id="preview-0-2" width="512" height="512"></canvas>
+                    <!-- Row 2 -->
+                    <canvas id="preview-1-0" width="512" height="512"></canvas>
+                    <canvas id="editor-canvas" width="512" height="512"></canvas>
+                    <canvas id="preview-1-2" width="512" height="512"></canvas>
+                    <!-- Row 3 -->
+                    <canvas id="preview-2-0" width="512" height="512"></canvas>
+                    <canvas id="preview-2-1" width="512" height="512"></canvas>
+                    <canvas id="preview-2-2" width="512" height="512"></canvas>
+                </div>
+            </div>
+
+            <!-- Floating Brush Controls Overlay -->
+            <div class="brush-controls-overlay">
+                <div class="brush-controls">
+                    <label for="brush-size">Brush Size:</label>
+                    <input type="range" id="brush-size" min="0" max="15" value="0" hidden="hidden">
+                    <span id="brush-size-value" class="brush-size-display">1</span>
+                    <div class="preset-sizes" id="floating-brush-presets">
+                        <button class="preset-btn" data-size="0">1</button>
+                        <button class="preset-btn" data-size="1">3</button>
+                        <button class="preset-btn" data-size="3">7</button>
+                        <button class="preset-btn" data-size="5">11</button>
+                    </div>
+
+                    <!-- Add Seperator-->
+        
+                    
+                    <label for="brush-size">Opacity:</label>
+                    <input type="range" id="opacity-size" min="0" max="100" value="100" hidden="hidden">
+                    <div class="preset-sizes opacity-presets">
+                        <button class="preset-btn opacity-btn" data-opacity="0.25">25%</button>
+                        <button class="preset-btn opacity-btn" data-opacity="0.5">50%</button>
+                        <button class="preset-btn opacity-btn" data-opacity="0.75">75%</button>
+                        <button class="preset-btn opacity-btn active" data-opacity="1">100%</button>
+                    </div>
+                </div>
+     
+            </div>
+
+  
+
+
+            <div id="info-box" class="info-box">
+                <p><strong>Instructions:</strong> Drag seamlessly across the 9 tiles to edit the central tile.
+                    Drawing now only stops when you release the mouse button or lift your finger.
+                    Use the toolbar on the left to switch between brush and eraser tools.</p>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL (SLIDE OUT) -->
+        <aside class="right-panel" id="side-panel">
+
+            <!-- Color Palette Section -->
+            <div id="panel-palette" class="panel-section">
+                <div class="section-title">
+                    <span>Color Palette</span>
+                    <div style="display:flex; gap:5px;">
+                        <button id="importPaletteUrlBtn" title="Import from Coolors URL"
+                            style="background:none; border:none; color:var(--accent-primary); cursor:pointer;">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button id="saveColorBtn" title="Save Color"
+                            style="background:none; border:none; color:var(--accent-primary); cursor:pointer;">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="color-controls">
+                    <input type="color" id="colorPicker" value="#282828"
+                        style="width:30px; height:30px; padding:0; border:none; background:none;">
+                    <input type="text" id="colorHex" value="#282828"
+                        style="background:transparent; border:1px solid var(--border-color); color:var(--text-primary); width:70px; padding:4px; font-family:monospace;">
+                </div>
+                <div id="palette-container" class="palette-grid">
+                    <!-- Palette swatches will be added here -->
+                </div>
+            </div>
+
+            <!-- Layers Section -->
+            <div id="panel-layers" class="panel-section hidden">
+                <div class="section-title">
+                    <span>Layers</span>
+                    <button id="addLayerBtn"
+                        style="background:none; border:none; color:var(--accent-primary); cursor:pointer;">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </div>
+                <div id="layers-list" class="layers-list" style="max-height: 400px;">
+                    <!-- Layers will be added here -->
+                </div>
+            </div>
+
+
+
+            <!-- Tool Options Section -->
+            <div id="panel-tool-options" class="panel-section">
+                <div class="section-title"><span>Tools Options</span></div>
+                <div style="margin-bottom:10px; display: block;" id="panel-tool-control">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <label style="font-size:11px; color:var(--text-secondary);">
+                            <span id="brushSizeLabelPanel">Brush Size</span>
+                        </label>
+                        <span style="font-size:11px; color:var(--text-secondary);" id="brushSizeDisplay">1</span>
+                    </div>
+                    <input type="range" id="brushSizeSlider" min="0" max="15" value="0" style="width:100%;">
+              
+                </div>
+                <div style="margin-bottom:10px;" id="panel-opacity-control">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <label style="font-size:11px; color:var(--text-secondary);">
+                            <span>Opacity</span>
+                        </label>
+                        <span style="font-size:11px; color:var(--text-secondary);" id="opacityDisplay">100</span>
+                    </div>
+                    <input type="range" id="opacitySlider" min="0" max="100" value="100" style="width:100%;">
+                </div>
+            </div>
+
+            <div id="panel-tool-canvas" class="panel-section hidden">
+                    <div class="section-title"><span>Canvas Options</span></div>
+                    <div class="canvas-size-controls">
+                        <div class="size-input-group">
+                            <input type="number" id="widthInput" value="32" min="4" max="512" 
+                                   placeholder="Width" class="size-input">
+                            <span class="size-separator">×</span>
+                            <input type="number" id="heightInput" value="32" min="4" max="512" 
+                                   placeholder="Height" class="size-input">
+                        </div>
+                        <button id="apply-canvas-resize" class="btn btn-apply-size" title="Apply Canvas Resize">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            <span>Apply</span>
+                        </button>
+                    </div>
+              <div class="size-description">
+                        Set the canvas dimensions (4-512 pixels)
+                    </div>
+            </div>
+
+
+        </aside>
+
+        <!-- Floating Toggle -->
+        <div id="panel-toggle" title="Toggle Panel">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <button class="modal-close-btn" id="btn-settings-x" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-title">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+            <div style="font-size:0.8rem; color:#94a3b8; margin-bottom:15px;">
+                Configure your Tilemap Studio preferences
+            </div>
+            <div class="settings-content">
+                <div class="property-group">
+                    <label class="property-label">
+                        <input type="checkbox" id="setting-grid" checked>
+                        Show Grid
+                    </label>
+                </div>
+                <div class="property-group">
+                    <label class="property-label">
+                        <input type="checkbox" id="setting-border" checked>
+                        Show Border
+                    </label>
+                </div>
+            
+                <div class="property-group">
+                    <label class="property-label">
+                        <input type="checkbox" id="setting-tooltips" checked>
+                        Show Tooltips
+                    </label>
+                </div>
+                <div class="property-group">
+                    <label class="property-label">
+                        <input type="checkbox" id="setting-helpers" checked>
+                        Show Helpers
+                    </label>
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">
+                        Default Background Color
+                    </label>
+                    <input type="color" id="setting-bg-color" value="#ffffff" 
+                           style="width:40px; height:24px; padding:0; border:1px solid var(--border-color); background:none; cursor:pointer; vertical-align:middle; margin-left:10px;">
+                </div>
+
+                 <div class="property-group">
+                    <label class="property-label">
+                        <input type="checkbox" id="setting-darkmode" checked>
+                    Dark Mode
+                    </label>
+                </div>
+         
+            <div class="property-group">
+                    <label class="property-label">
+                    <input type="checkbox" id="setting-autosave" checked>
+                     Auto Save
+                </label>
+            </div>
+
+                
+                 
+           
+               
+            </div>
+            <div class="modal-actions">
+                <button class="btn" id="btn-settings-close">Cancel</button>
+                <button class="btn" id="btn-settings-reset">Reset</button>
+
+                <button class="btn primary" id="btn-settings-save">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Hidden file inputs -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+    <input type="file" id="paletteFileInput" accept=".ase" style="display: none;">
+
+
+    <!-- Core modules -->
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/dom.js"></script>
+
+    <!-- Specialized modules -->
+    <script src="js/tilemap-core.js"></script>
+    <script src="js/palette-manager.js"></script>
+    <script src="js/layer-manager.js"></script>
+    <script src="js/tool-manager.js"></script>
+    <script src="js/file-manager.js"></script>
+    <script src="js/settings-manager.js"></script>
+    <script src="js/zoom-manager.js"></script>
+
+    <!-- Input handling -->
+    <script src="js/input-handler.js"></script>
+    <script src="js/ui-manager.js"></script>
+
+    <!-- Main application -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>

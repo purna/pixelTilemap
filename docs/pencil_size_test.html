@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pencil Size Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-area { 
+            border: 2px solid #333; 
+            width: 200px; 
+            height: 200px; 
+            margin: 20px 0;
+            position: relative;
+        }
+        .info { 
+            background: #f0f0f0; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Pencil Size Fix Test</h1>
+    <div class="info">
+        <h3>Test Instructions:</h3>
+        <ol>
+            <li>Open the main application (index.html) in your browser</li>
+            <li>Select the pencil tool</li>
+            <li>Try changing the pencil size using the presets (1, 2, 3, 4) or the slider</li>
+            <li>Draw on the canvas and verify that:
+                <ul>
+                    <li>Size 1 draws a single pixel</li>
+                    <li>Size 2 draws a 3x3 block</li>
+                    <li>Size 3 draws a 5x5 block</li>
+                    <li>Size 4 draws a 7x7 block</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+    
+    <div class="info success">
+        <h3>✅ Fixes Applied:</h3>
+        <p><strong>Fix 1:</strong> Changed <code>const drawR = State.currentTool === 'pencil' ? 0 : State.brushSize;</code></p>
+        <p>To: <code>const drawR = State.brushSize;</code></p>
+        <p>This allows the pencil tool to respect the brush size setting instead of always using 1x1.</p>
+        <p><strong>Fix 2:</strong> Removed 80% opacity override for pencil tool</p>
+        <p>Now pencil tool uses full opacity (100%) with hard edges, only brush tool has blur/opacity effects.</p>
+    </div>
+    
+    <div class="info">
+        <h3>Expected Behavior:</h3>
+        <ul>
+            <li><strong>Size 1 (radius 0):</strong> Single pixel with FULL opacity (100%)</li>
+            <li><strong>Size 2 (radius 1):</strong> 3x3 block with hard edges, full opacity</li>
+            <li><strong>Size 3 (radius 2):</strong> 5x5 block with hard edges, full opacity</li>
+            <li><strong>Size 4 (radius 3):</strong> 7x7 block with hard edges, full opacity</li>
+        </ul>
+        <p><em>Note: Only the brush tool has soft edges with alpha blending.</em></p>
+    </div>
+    
+    <div class="info success">
+        <h3>✅ UI Panel Improvements:</h3>
+        <p><strong>Right Panel Updates:</strong></p>
+        <ul>
+            <li>Pencil/Brush/Eraser sizes now update properly in the right panel</li>
+            <li>Labels now correctly show "Pencil Size", "Brush Size", or "Eraser Size"</li>
+            <li>Values moved to the right of sliders (e.g., "3x3" instead of inline with label)</li>
+            <li>Opacity values now show on the right side as well</li>
+        </ul>
+    </div>
+    
+    <div class="info">
+        <h3>Before Fix:</h3>
+        <p>All pencil sizes drew only a single pixel (1x1), ignoring the size setting.</p>
+    </div>
+    
+    <div class="info">
+        <h3>After Fix:</h3>
+        <p>Pencil sizes now respect the selected size, maintaining hard edges while the brush tool gets soft edges with alpha blending.</p>
+    </div>
+</body>
+</html>

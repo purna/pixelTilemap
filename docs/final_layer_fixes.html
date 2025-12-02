@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Layer System & Panel Fixes</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-area { 
+            border: 2px solid #333; 
+            width: 200px; 
+            height: 200px; 
+            margin: 20px 0;
+            position: relative;
+        }
+        .info { 
+            background: #fff; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        .warning { border-left-color: #ffc107; background: #fff3cd; }
+        .fix { border-left-color: #17a2b8; background: #d1ecf1; }
+    </style>
+</head>
+<body>
+    <h1>Layer System & Panel Fixes</h1>
+
+    <div class="info success">
+        <h3>✅ Panel Height Fixes Applied:</h3>
+        <ul>
+            <li><strong>Palette Grid:</strong> Added max-height: 200px with vertical scrollbar</li>
+            <li><strong>Layers List:</strong> Already had max-height: 300px, enhanced scrollbar styling</li>
+            <li><strong>Custom Scrollbars:</strong> Applied consistent styling for both panels</li>
+        </ul>
+    </div>
+
+    <div class="info fix">
+        <h3>🔧 Layer System Drawing Order Fix:</h3>
+        <p><strong>Issue:</strong> Users could only paint in the "bottom" layer due to incorrect compositing order.</p>
+        <p><strong>Root Cause:</strong> Layers were being composited in array order instead of proper z-order (bottom to top).</p>
+    </div>
+
+    <div class="info error">
+        <h3>🐛 Bugs Fixed:</h3>
+        <ol>
+            <li><strong>Layer Compositing:</strong> Changed `State.layers.forEach()` to `State.layers.slice().reverse().forEach()`</li>
+            <li><strong>UI Layer Order:</strong> Layers now display top-to-bottom in UI while maintaining proper z-order</li>
+            <li><strong>Active Layer Display:</strong> Active layer highlighting now works correctly with reversed UI</li>
+            <li><strong>Layer Previews:</strong> Preview canvases show correct layer content in proper order</li>
+        </ol>
+    </div>
+
+    <div class="info warning">
+        <h3>⚠️ How Layer System Now Works:</h3>
+        <ul>
+            <li><strong>Drawing:</strong> Always draws to the active layer (topmost visible layer by default)</li>
+            <li><strong>Display Order:</strong> Bottom layer drawn first, top layer drawn last (proper z-order)</li>
+            <li><strong>UI Order:</strong> Shows layers from top to bottom for intuitive editing</li>
+            <li><strong>Visibility:</strong> Eye icon toggles individual layer visibility in real-time</li>
+            <li><strong>Layer Switching:</strong> Click layer to make it active for drawing</li>
+            <li><strong>Layer Deletion:</strong> Removes both the layer entry and its content</li>
+        </ul>
+    </div>
+
+    <div class="info">
+        <h3>🧪 Testing Instructions:</h3>
+        <ol>
+            <li>Open the main application</li>
+            <li>Draw something on the default layer</li>
+            <li>Add a new layer using the + button</li>
+            <li>Switch to the new layer (click it) and draw something different</li>
+            <li>Add another layer and repeat</li>
+            <li>Toggle layer visibility (eye icons) - should hide/show correctly</li>
+            <li>Delete a layer - should remove both the layer and its content</li>
+            <li>Test layer renaming with double-click</li>
+        </ol>
+    </div>
+
+    <div class="info">
+        <h3>📋 Technical Changes Summary:</h3>
+        <p><strong>css/tilemap-styles.css:</strong></p>
+        <ul>
+            <li>Added max-height and scrollbar styling to palette-grid</li>
+            <li>Enhanced scrollbar styling for both palette and layers</li>
+        </ul>
+        <p><strong>js/tilemap-core.js:</strong></p>
+        <ul>
+            <li>Fixed layer compositing order in updatePreviews()</li>
+            <li>Layers now draw bottom-to-top for proper z-order</li>
+        </ul>
+        <p><strong>js/layer-manager.js:</strong></p>
+        <ul>
+            <li>Fixed renderLayers() to show layers top-to-bottom in UI</li>
+            <li>Maintains correct index mapping for active layer highlighting</li>
+        </ul>
+    </div>
+
+    <div class="info fix">
+        <h3>🎯 Expected Behavior Now:</h3>
+        <ul>
+            <li><strong>Panel Scroll:</strong> Palette and layers panels have max height with scrollbars</li>
+            <li><strong>Layer Drawing:</strong> Can paint on any layer by clicking to activate it</li>
+            <li><strong>Layer Order:</strong> Proper z-order stacking (bottom layer covered by layers above)</li>
+            <li><strong>UI Display:</strong> Layers show top to bottom for intuitive editing</li>
+            <li><strong>Active Layer:</strong> Clear indication of which layer is currently active for drawing</li>
+        </ul>
+    </div>
+</body>
+</html>

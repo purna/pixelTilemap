@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transparent Layers + Drag & Drop</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .info { 
+            background: #fff; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        .warning { border-left-color: #ffc107; background: #fff3cd; }
+        .fix { border-left-color: #17a2b8; background: #d1ecf1; }
+    </style>
+</head>
+<body>
+    <h1>Transparent Layers + Drag & Drop Functionality</h1>
+
+    <div class="info success">
+        <h3>✅ Issue 1 Fixed: Transparent Layer Backgrounds</h3>
+        <p><strong>Problem:</strong> Each layer had a white background instead of being transparent</p>
+        <p><strong>Solution:</strong> Changed `createLayerCanvas()` to use `clearRect()` instead of `fillRect(Config.ERASE_COLOR)`</p>
+        <p><strong>Result:</strong> Layers now start transparent, allowing proper layer compositing</p>
+    </div>
+
+    <div class="info fix">
+        <h3>🖱️ Issue 2 Added: Drag & Drop Layer Reordering</h3>
+        <p><strong>Feature:</strong> Layers can now be reordered by dragging them up and down</p>
+        <p><strong>Implementation:</strong></p>
+        <ul>
+            <li>Added draggable attribute to layer items</li>
+            <li>Implemented drag and drop event handlers</li>
+            <li>Added visual feedback during drag operations</li>
+            <li>Proper active layer index tracking during reordering</li>
+            <li>Added CSS styles for drag cursor and hover effects</li>
+        </ul>
+    </div>
+
+    <div class="info warning">
+        <h3>⚠️ How to Use Drag & Drop:</h3>
+        <ol>
+            <li><strong>Identify Draggable Layers:</strong> Hover over layer items - cursor changes to "move" pointer</li>
+            <li><strong>Start Dragging:</strong> Click and hold on a layer item, then drag</li>
+            <li><strong>Visual Feedback:</strong> 
+                <ul>
+                    <li>Dragged layer becomes semi-transparent with dashed border</li>
+                    <li>Drop target shows blue border highlight</li>
+                </ul>
+            </li>
+            <li><strong>Drop:</strong> Release mouse button over target position to reorder</li>
+            <li><strong>Result:</strong> Layer order changes and canvas updates immediately</li>
+        </ol>
+    </div>
+
+    <div class="info">
+        <h3>🧪 Testing Instructions:</h3>
+        <ol>
+            <li><strong>Test Transparent Layers:</strong>
+                <ul>
+                    <li>Create multiple layers</li>
+                    <li>Draw on each layer with different colors</li>
+                    <li>Toggle layer visibility to see transparent backgrounds</li>
+                    <li>Verify layers composite properly without white backgrounds</li>
+                </ul>
+            </li>
+            <li><strong>Test Drag & Drop:</strong>
+                <ul>
+                    <li>Create at least 3 layers with different content</li>
+                    <li>Drag the top layer to the bottom</li>
+                    <li>Drag the bottom layer to the middle position</li>
+                    <li>Verify canvas updates show correct new layer order</li>
+                    <li>Check that active layer highlighting follows the layer</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="info">
+        <h3>📋 Files Modified:</h3>
+        <p><strong>js/state.js:</strong></p>
+        <ul>
+            <li>Changed `createLayerCanvas()` to use transparent background</li>
+        </ul>
+        <p><strong>js/layer-manager.js:</strong></p>
+        <ul>
+            <li>Added drag and drop event listeners</li>
+            <li>Implemented `handleDragStart()`, `handleDragOver()`, `handleDrop()`</li>
+            <li>Added `reorderLayers()` method for layer reordering</li>
+            <li>Added `draggedElement` property for tracking</li>
+        </ul>
+        <p><strong>js/dom.js:</strong></p>
+        <ul>
+            <li>Added `draggable="true"` attribute to layer items</li>
+        </ul>
+        <p><strong>css/tilemap-styles.css:</strong></p>
+        <ul>
+            <li>Added cursor: move for draggable layers</li>
+            <li>Added hover effects for draggable items</li>
+            <li>Enhanced drag-over visual feedback</li>
+        </ul>
+    </div>
+
+    <div class="info success">
+        <h3>🎯 Expected Results:</h3>
+        <ul>
+            <li><strong>Transparent Layers:</strong> Layers have transparent backgrounds, proper compositing</li>
+            <li><strong>Drag & Drop:</strong> Smooth layer reordering with visual feedback</li>
+            <li><strong>Layer Order:</strong> Canvas updates reflect new layer stacking order</li>
+            <li><strong>Active Layer:</strong> Active layer tracking works correctly after reordering</li>
+            <li><strong>Visual Feedback:</strong> Clear indication during drag operations</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Layer System Debug Guide</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .info { 
+            background: #fff; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        .warning { border-left-color: #ffc107; background: #fff3cd; }
+        .debug { border-left-color: #17a2b8; background: #d1ecf1; }
+    </style>
+</head>
+<body>
+    <h1>Layer System Debug Guide</h1>
+
+    <div class="info warning">
+        <h3>⚠️ Current Known Issues:</h3>
+        <ol>
+            <li><strong>Layer Switching:</strong> Once painting in one layer, can't switch to paint in another</li>
+            <li><strong>Visibility Toggle:</strong> Eye icons don't hide/show layers properly</li>
+        </ol>
+    </div>
+
+    <div class="info debug">
+        <h3>🔍 Debug Steps Applied:</h3>
+        <ul>
+            <li>Added console logging to layer switching functions</li>
+            <li>Added console logging to visibility toggle functions</li>
+            <li>Improved event handling with preventDefault and stopPropagation</li>
+            <li>Enhanced layer controls click detection</li>
+        </ul>
+    </div>
+
+    <div class="info">
+        <h3>🧪 Testing Instructions:</h3>
+        <ol>
+            <li><strong>Open Browser Console</strong> (F12) to see debug messages</li>
+            <li><strong>Test Layer Switching:</strong>
+                <ul>
+                    <li>Click on different layers in the layers panel</li>
+                    <li>Should see "Setting active layer to index: X" in console</li>
+                    <li>Try drawing on each layer to verify switching works</li>
+                </ul>
+            </li>
+            <li><strong>Test Visibility Toggle:</strong>
+                <ul>
+                    <li>Click eye icons in layers panel</li>
+                    <li>Should see "Toggling visibility for layer index: X" in console</li>
+                    <li>Should see visibility state changes in console</li>
+                    <li>Canvas should hide/show layer content</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="info error">
+        <h3>🔧 Expected Console Output:</h3>
+        <p><strong>Layer Switching:</strong></p>
+        <pre>
+Setting active layer to index: 1
+Active layer index after setting: 1
+        </pre>
+        <p><strong>Visibility Toggle:</strong></p>
+        <pre>
+Toggling visibility for layer index: 0
+Current layer visibility before toggle: true
+Layer visibility after toggle: false
+        </pre>
+    </div>
+
+    <div class="info success">
+        <h3>📋 Next Steps if Issues Persist:</h3>
+        <ol>
+            <li><strong>Check Console Errors:</strong> Look for JavaScript errors</li>
+            <li><strong>Verify Layer Array:</strong> Ensure State.layers array has correct data</li>
+            <li><strong>Check Active Layer Index:</strong> Verify State.activeLayerIndex updates</li>
+            <li><strong>Test Drawing Target:</strong> Ensure drawing goes to correct layer canvas</li>
+            <li><strong>Verify Preview Updates:</strong> Check if canvas updates reflect changes</li>
+        </ol>
+    </div>
+</body>
+</html>
