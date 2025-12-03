@@ -138,10 +138,6 @@ pixelTilemaps/
 │   ├── zoom-manager.js     # Zoom controls
 │   ├── input-handler.js    # Mouse/touch input
 │   └── ui-manager.js       # UI interactions
-├── docs/                   # Documentation and tests
-│   ├── layer_system_test.html
-│   ├── transparent_layers_and_drag_drop.html
-│   └── [other test files]
 └── [icons and manifest files]
 ```
 
