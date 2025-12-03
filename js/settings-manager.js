@@ -15,7 +15,7 @@ const SettingsManager = {
         theme: 'dark',
         exportQuality: 1.0,
         canvasSize: { width: 32, height: 32 },
-        backgroundColor: '#ffffff'
+        backgroundColor: 'transparent'
     },
 
     init() {
@@ -128,10 +128,10 @@ const SettingsManager = {
         const cameraSlider = document.getElementById('setting-camera-speed');
         const cameraDisplay = document.getElementById('camera-speed-value');
         const bgColorPicker = document.getElementById('setting-bg-color');
-        
+
         // Canvas size inputs
-        const widthInput = document.getElementById('widthInput');
-        const heightInput = document.getElementById('heightInput');
+        const widthInput = document.getElementById('canvasWidth');
+        const heightInput = document.getElementById('canvasHeight');
 
         if (gridCheckbox) gridCheckbox.checked = this.settings.showGrid;
         if (axesCheckbox) axesCheckbox.checked = this.settings.showAxes || true;
@@ -142,12 +142,22 @@ const SettingsManager = {
             cameraSlider.value = this.settings.cameraSpeed || 1.0;
             if (cameraDisplay) cameraDisplay.textContent = (this.settings.cameraSpeed || 1.0).toFixed(1);
         }
-        if (bgColorPicker) bgColorPicker.value = this.settings.backgroundColor || '#ffffff';
-        
+        if (bgColorPicker) {
+            const bgColor = this.settings.backgroundColor;
+            if (bgColor === 'transparent') {
+                bgColorPicker.value = '#ffffff';
+                this.setBackgroundMode('transparent');
+            } else {
+                bgColorPicker.value = bgColor;
+                this.setBackgroundMode('color');
+                this.updateColorPreview(bgColor);
+            }
+        }
+
         // Update canvas size inputs with current settings or config defaults
         const canvasWidth = this.settings.canvasSize?.width || Config.TILE_DIM;
         const canvasHeight = this.settings.canvasSize?.height || Config.TILE_DIM;
-        
+
         if (widthInput) widthInput.value = canvasWidth;
         if (heightInput) heightInput.value = canvasHeight;
     },
@@ -193,9 +203,24 @@ const SettingsManager = {
                     <div class="setting-item">
                         <label class="setting-label" for="canvasWidth">Tile Resolution (W&times;H)</label>
                         <div class="setting-control setting-control-group">
-                            <input type="number" id="canvasWidth" min="8" max="128" value="${this.settings.canvasSize.width}" title="Tile Width">
+                            <input type="range" id="canvasWidth" min="4" max="1024" value="${this.settings.canvasSize.width}" title="Tile Width">
                             <span>&times;</span>
-                            <input type="number" id="canvasHeight" min="8" max="128" value="${this.settings.canvasSize.height}" title="Tile Height">
+                            <input type="number" id="canvasHeight" min="4" max="1024" value="${this.settings.canvasSize.height}" title="Tile Height" readonly>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn primary" id="apply-canvas-resize"><i class="fas fa-check"></i> Apply Canvas Size</button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Background</h3>
+                    <div class="setting-item">
+                        <label class="setting-label" for="setting-bg-color">Background Color</label>
+                        <div class="setting-control setting-control-group">
+                            <input type="color" id="setting-bg-color" value="${this.settings.backgroundColor === 'transparent' ? '#ffffff' : this.settings.backgroundColor}">
+                            <button class="btn" id="transparent-bg-btn" title="Set Transparent Background"><i class="fas fa-eye-slash"></i></button>
+                            <button class="btn" id="remove-bg-btn" title="Remove Background Color"><i class="fas fa-times"></i></button>
                         </div>
                     </div>
                 </div>
@@ -294,6 +319,49 @@ const SettingsManager = {
                 this.applyCanvasResize();
             });
         }
+
+        // Width slider event listener
+        const widthSlider = document.getElementById('canvasWidth');
+        const heightInput = document.getElementById('canvasHeight');
+        if (widthSlider && heightInput) {
+            widthSlider.addEventListener('input', (e) => {
+                const widthValue = parseInt(e.target.value);
+                heightInput.value = widthValue; // Update height to match width
+            });
+        }
+
+        // Background mode toggle buttons
+        const bgModeBtns = document.querySelectorAll('.bg-mode-btn');
+        bgModeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.mode;
+                this.setBackgroundMode(mode);
+            });
+        });
+
+        // Color picker
+        const bgColorPicker = document.getElementById('setting-bg-color');
+        if (bgColorPicker) {
+            bgColorPicker.addEventListener('input', (e) => {
+                this.updateColorPreview(e.target.value);
+                this.settings.backgroundColor = e.target.value;
+                this.applyBackgroundColor(e.target.value);
+                this.saveSettingsToStorage();
+            });
+        }
+
+        // Remove background color button
+        const removeBgBtn = document.getElementById('remove-bg-btn');
+        if (removeBgBtn) {
+            removeBgBtn.addEventListener('click', () => {
+                this.settings.backgroundColor = 'transparent';
+                this.applyBackgroundColor('transparent');
+                this.saveSettingsToStorage();
+                if (typeof InputHandler !== 'undefined') {
+                    InputHandler.showNotification('Background color removed (transparent)', 'success');
+                }
+            });
+        }
     },
 
     saveSettings() {
@@ -307,8 +375,8 @@ const SettingsManager = {
         const bgColorPicker = document.getElementById('setting-bg-color');
         
         // Canvas size inputs
-        const widthInput = document.getElementById('widthInput');
-        const heightInput = document.getElementById('heightInput');
+        const widthInput = document.getElementById('canvasWidth');
+        const heightInput = document.getElementById('canvasHeight');
 
         this.settings.showGrid = gridCheckbox ? gridCheckbox.checked : true;
         this.settings.showAxes = axesCheckbox ? axesCheckbox.checked : true;
@@ -316,13 +384,26 @@ const SettingsManager = {
         this.settings.showTooltips = tooltipsCheckbox ? tooltipsCheckbox.checked : true;
         this.settings.showHelpers = helpersCheckbox ? helpersCheckbox.checked : true;
         this.settings.cameraSpeed = cameraSlider ? parseFloat(cameraSlider.value) : 1.0;
-        this.settings.backgroundColor = bgColorPicker ? bgColorPicker.value : '#ffffff';
-        
+        // Handle background color setting from form
+        const bgModeBtns = document.querySelectorAll('.bg-mode-btn');
+        const activeMode = Array.from(bgModeBtns).find(btn => btn.classList.contains('active'));
+        if (activeMode) {
+            const mode = activeMode.dataset.mode;
+            if (mode === 'transparent') {
+                this.settings.backgroundColor = 'transparent';
+            } else if (bgColorPicker) {
+                this.settings.backgroundColor = bgColorPicker.value;
+            }
+        } else if (bgColorPicker) {
+            this.settings.backgroundColor = bgColorPicker.value;
+        }
+
         // Save canvas size from inputs (use current input values)
         if (widthInput && heightInput) {
+            const widthValue = parseInt(widthInput.value) || Config.TILE_DIM;
             this.settings.canvasSize = {
-                width: parseInt(widthInput.value) || Config.TILE_DIM,
-                height: parseInt(heightInput.value) || Config.TILE_DIM
+                width: widthValue,
+                height: widthValue // Square images - use same value for height
             };
         }
 
@@ -338,34 +419,34 @@ const SettingsManager = {
     },
 
     applyCanvasResize() {
-        const widthInput = document.getElementById('widthInput');
-        const heightInput = document.getElementById('heightInput');
-        
+        const widthInput = document.getElementById('canvasWidth');
+        const heightInput = document.getElementById('canvasHeight');
+
         if (!widthInput || !heightInput) {
             console.error('Canvas size inputs not found');
             return;
         }
-        
+
         const newWidth = parseInt(widthInput.value);
-        const newHeight = parseInt(heightInput.value);
-        
+        const newHeight = newWidth; // Square images - use same value for height
+
         // Validate input ranges
-        if (newWidth < 4 || newWidth > 512 || newHeight < 4 || newHeight > 512) {
+        if (newWidth < 4 || newWidth > 1024) {
             if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Canvas size must be between 4 and 512 pixels', 'error');
+                InputHandler.showNotification('Canvas size must be between 4 and 1024 pixels', 'error');
             }
             return;
         }
-        
+
         // Update settings
         this.settings.canvasSize = { width: newWidth, height: newHeight };
-        
+
         // Apply the resize to the actual canvas
         this.resizeCanvas(newWidth, newHeight);
-        
+
         // Save to storage
         this.saveSettingsToStorage();
-        
+
         if (typeof InputHandler !== 'undefined') {
             InputHandler.showNotification(`Canvas resized to ${newWidth}×${newHeight}`, 'success');
         }
@@ -409,7 +490,7 @@ const SettingsManager = {
                     width: Config.TILE_DIM, 
                     height: Config.TILE_DIM 
                 },
-                backgroundColor: '#ffffff'
+                backgroundColor: 'transparent'
             };
 
             // Update HTML form
@@ -464,13 +545,21 @@ const SettingsManager = {
         // Apply background color to the tile grid container
         const tileGrid = document.querySelector('.tile-grid');
         if (tileGrid) {
-            tileGrid.style.backgroundColor = color;
+            if (color === 'transparent') {
+                tileGrid.style.backgroundColor = 'transparent';
+                tileGrid.style.backgroundImage = 'linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%)';
+                tileGrid.style.backgroundSize = '20px 20px';
+                tileGrid.style.backgroundPosition = '0 0, 0 10px, 10px -10px, -10px 0px';
+            } else {
+                tileGrid.style.backgroundColor = color;
+                tileGrid.style.backgroundImage = 'none';
+            }
         }
-        
+
         // Also update the workspace background
         const workspace = document.querySelector('.workspace');
         if (workspace) {
-            workspace.style.setProperty('--canvas-bg-color', color);
+            workspace.style.setProperty('--canvas-bg-color', color === 'transparent' ? 'transparent' : color);
         }
     },
 
@@ -527,6 +616,58 @@ const SettingsManager = {
 
         if (typeof InputHandler !== 'undefined') {
             InputHandler.showNotification('Settings exported successfully', 'success');
+        }
+    },
+
+    setBackgroundMode(mode) {
+        // Update toggle button states
+        const bgModeBtns = document.querySelectorAll('.bg-mode-btn');
+        const colorSection = document.getElementById('bg-color-section');
+        const transparentSection = document.getElementById('bg-transparent-section');
+
+        bgModeBtns.forEach(btn => {
+            const btnMode = btn.dataset.mode;
+            if (btnMode === mode) {
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+            } else {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            }
+        });
+
+        // Show/hide appropriate sections
+        if (mode === 'transparent') {
+            colorSection?.classList.add('hidden');
+            transparentSection?.classList.remove('hidden');
+            this.settings.backgroundColor = 'transparent';
+            this.applyBackgroundColor('transparent');
+        } else {
+            colorSection?.classList.remove('hidden');
+            transparentSection?.classList.add('hidden');
+            // Don't change the color here, just update the UI state
+        }
+
+        this.saveSettingsToStorage();
+        
+        if (typeof InputHandler !== 'undefined') {
+            const message = mode === 'transparent' ? 
+                'Background set to transparent' : 
+                'Background color mode selected';
+            InputHandler.showNotification(message, 'success');
+        }
+    },
+
+    updateColorPreview(color) {
+        const previewBox = document.getElementById('preview-box');
+        const colorValue = document.getElementById('color-value');
+        
+        if (previewBox) {
+            previewBox.style.backgroundColor = color;
+        }
+        
+        if (colorValue) {
+            colorValue.textContent = color.toLowerCase();
         }
     }
 };

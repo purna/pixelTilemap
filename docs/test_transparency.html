@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Transparency Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .test-steps {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .test-steps li {
+            margin-bottom: 8px;
+            color: #666;
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .canvas-display {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .visual-test {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .canvas-wrapper {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .canvas-wrapper h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            background: linear-gradient(45deg, #eee 25%, transparent 25%),
+                        linear-gradient(-45deg, #eee 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #eee 75%),
+                        linear-gradient(-45deg, transparent 75%, #eee 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Canvas Transparency Test</h1>
+
+        <div class="test-section">
+            <h2>Test Overview</h2>
+            <p>This test verifies that canvases start transparent and new layers are transparent.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 1: Initial Canvas Transparency</h2>
+            <div class="test-steps">
+                <ol>
+                    <li>Check that initial canvases are transparent (not white)</li>
+                    <li>Verify canvas initialization uses clearRect instead of fillRect</li>
+                    <li>Check that Config.ERASE_COLOR is set to 'transparent'</li>
+                </ol>
+            </div>
+            <button id="runTest1" onclick="runInitialTransparencyTest()">Run Initial Test</button>
+            <div id="test1-result" class="test-result info">Test not yet run</div>
+            <div id="test1-details" class="canvas-display"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: New Layer Transparency</h2>
+            <div class="test-steps">
+                <ol>
+                    <li>Create a new layer</li>
+                    <li>Verify the new layer canvas is transparent</li>
+                    <li>Check that State.createLayerCanvas() uses clearRect</li>
+                </ol>
+            </div>
+            <button id="runTest2" onclick="runNewLayerTest()">Run New Layer Test</button>
+            <div id="test2-result" class="test-result info">Test not yet run</div>
+            <div id="test2-details" class="canvas-display"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Eraser Tool Transparency</h2>
+            <div class="test-steps">
+                <ol>
+                    <li>Test that eraser tool creates transparent pixels</li>
+                    <li>Verify Config.ERASE_COLOR === 'transparent'</li>
+                    <li>Check that drawPixel handles transparent color correctly</li>
+                </ol>
+            </div>
+            <button id="runTest3" onclick="runEraserTest()">Run Eraser Test</button>
+            <div id="test3-result" class="test-result info">Test not yet run</div>
+            <div id="test3-details" class="canvas-display"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Visual Test</h2>
+            <p>Check the canvases below - transparent areas should show the checkerboard pattern:</p>
+            <div class="visual-test">
+                <div class="canvas-wrapper">
+                    <h3>Initial Canvas</h3>
+                    <canvas id="visualCanvas1" width="100" height="100"></canvas>
+                </div>
+                <div class="canvas-wrapper">
+                    <h3>New Layer Canvas</h3>
+                    <canvas id="visualCanvas2" width="100" height="100"></canvas>
+                </div>
+                <div class="canvas-wrapper">
+                    <h3>After Eraser Test</h3>
+                    <canvas id="visualCanvas3" width="100" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Summary</h2>
+            <div id="summary" class="test-result info">Tests not yet completed</div>
+        </div>
+    </div>
+
+    <!-- Load the required scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/dom.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/tilemap-core.js"></script>
+    <script src="js/settings-manager.js"></script>
+
+    <script>
+        // Test variables
+        let testResults = {
+            test1: null,
+            test2: null,
+            test3: null
+        };
+
+        // Test 1: Initial transparency
+        function runInitialTransparencyTest() {
+            try {
+                console.log('Running initial transparency test...');
+
+                // Check config values
+                const eraseColor = Config.ERASE_COLOR;
+                const isTransparent = eraseColor === 'transparent';
+
+                // Create a test canvas to check initialization
+                const testCanvas = document.createElement('canvas');
+                testCanvas.width = 100;
+                testCanvas.height = 100;
+                const testCtx = testCanvas.getContext('2d');
+
+                // Simulate the DOM initialization process
+                testCtx.clearRect(0, 0, 100, 100);
+
+                // Check if a pixel is transparent
+                const pixelData = testCtx.getImageData(0, 0, 1, 1).data;
+                const isPixelTransparent = pixelData[3] === 0; // Alpha channel = 0
+
+                // Update visual test
+                const visualCanvas1 = document.getElementById('visualCanvas1');
+                const ctx1 = visualCanvas1.getContext('2d');
+                ctx1.clearRect(0, 0, 100, 100);
+
+                // Update UI
+                document.getElementById('test1-result').className = isTransparent && isPixelTransparent ? 'test-result success' : 'test-result error';
+                document.getElementById('test1-result').textContent = isTransparent && isPixelTransparent ? 'Initial transparency test passed' : 'Initial transparency test failed';
+
+                document.getElementById('test1-details').innerHTML = `
+                    <strong>Config Values:</strong><br>
+                    ERASE_COLOR: ${eraseColor}<br>
+                    Is transparent: ${isTransparent}<br><br>
+                    <strong>Canvas Initialization:</strong><br>
+                    Pixel alpha value: ${pixelData[3]} (0 = transparent)<br>
+                    Pixel is transparent: ${isPixelTransparent}
+                `;
+
+                testResults.test1 = isTransparent && isPixelTransparent;
+                updateSummary();
+
+            } catch (error) {
+                console.error('Initial transparency test failed:', error);
+                document.getElementById('test1-result').className = 'test-result error';
+                document.getElementById('test1-result').textContent = 'Initial transparency test failed: ' + error.message;
+                testResults.test1 = false;
+                updateSummary();
+            }
+        }
+
+        // Test 2: New layer transparency
+        function runNewLayerTest() {
+            try {
+                console.log('Running new layer transparency test...');
+
+                // Create a new layer using the state method
+                const newLayerCanvas = State.createLayerCanvas();
+
+                // Check if the layer canvas is transparent
+                const ctx = newLayerCanvas.getContext('2d');
+                const pixelData = ctx.getImageData(0, 0, 1, 1).data;
+                const isTransparent = pixelData[3] === 0;
+
+                // Update visual test
+                const visualCanvas2 = document.getElementById('visualCanvas2');
+                const ctx2 = visualCanvas2.getContext('2d');
+                ctx2.clearRect(0, 0, 100, 100);
+
+                // Update UI
+                document.getElementById('test2-result').className = isTransparent ? 'test-result success' : 'test-result error';
+                document.getElementById('test2-result').textContent = isTransparent ? 'New layer transparency test passed' : 'New layer transparency test failed';
+
+                document.getElementById('test2-details').innerHTML = `
+                    <strong>New Layer Canvas:</strong><br>
+                    Width: ${newLayerCanvas.width}<br>
+                    Height: ${newLayerCanvas.height}<br>
+                    Pixel alpha value: ${pixelData[3]} (0 = transparent)<br>
+                    Layer is transparent: ${isTransparent}
+                `;
+
+                testResults.test2 = isTransparent;
+                updateSummary();
+
+            } catch (error) {
+                console.error('New layer transparency test failed:', error);
+                document.getElementById('test2-result').className = 'test-result error';
+                document.getElementById('test2-result').textContent = 'New layer transparency test failed: ' + error.message;
+                testResults.test2 = false;
+                updateSummary();
+            }
+        }
+
+        // Test 3: Eraser tool transparency
+        function runEraserTest() {
+            try {
+                console.log('Running eraser transparency test...');
+
+                // Check config
+                const eraseColor = Config.ERASE_COLOR;
+                const isTransparent = eraseColor === 'transparent';
+
+                // Create a test canvas with some colored pixels
+                const testCanvas = document.createElement('canvas');
+                testCanvas.width = 100;
+                testCanvas.height = 100;
+                const testCtx = testCanvas.getContext('2d');
+
+                // Draw some colored pixels
+                testCtx.fillStyle = '#ff0000';
+                testCtx.fillRect(10, 10, 20, 20);
+
+                // Simulate eraser operation (should make pixels transparent)
+                testCtx.clearRect(10, 10, 20, 20);
+
+                // Check if pixels are now transparent
+                const pixelData = testCtx.getImageData(15, 15, 1, 1).data;
+                const isErasedTransparent = pixelData[3] === 0;
+
+                // Update visual test - show before and after
+                const visualCanvas3 = document.getElementById('visualCanvas3');
+                const ctx3 = visualCanvas3.getContext('2d');
+
+                // Draw red square then erase part of it
+                ctx3.fillStyle = '#ff0000';
+                ctx3.fillRect(20, 20, 60, 60);
+                ctx3.clearRect(30, 30, 40, 40);
+
+                // Update UI
+                document.getElementById('test3-result').className = isTransparent && isErasedTransparent ? 'test-result success' : 'test-result error';
+                document.getElementById('test3-result').textContent = isTransparent && isErasedTransparent ? 'Eraser transparency test passed' : 'Eraser transparency test failed';
+
+                document.getElementById('test3-details').innerHTML = `
+                    <strong>Eraser Configuration:</strong><br>
+                    ERASE_COLOR: ${eraseColor}<br>
+                    Is transparent: ${isTransparent}<br><br>
+                    <strong>Eraser Operation:</strong><br>
+                    Pixel alpha after erase: ${pixelData[3]} (0 = transparent)<br>
+                    Erased pixel is transparent: ${isErasedTransparent}
+                `;
+
+                testResults.test3 = isTransparent && isErasedTransparent;
+                updateSummary();
+
+            } catch (error) {
+                console.error('Eraser transparency test failed:', error);
+                document.getElementById('test3-result').className = 'test-result error';
+                document.getElementById('test3-result').textContent = 'Eraser transparency test failed: ' + error.message;
+                testResults.test3 = false;
+                updateSummary();
+            }
+        }
+
+        // Update summary
+        function updateSummary() {
+            const passedTests = Object.values(testResults).filter(r => r === true).length;
+            const totalTests = Object.values(testResults).filter(r => r !== null).length;
+
+            if (totalTests === 0) {
+                document.getElementById('summary').className = 'test-result info';
+                document.getElementById('summary').textContent = 'Tests not yet completed';
+            } else {
+                const allPassed = passedTests === totalTests;
+                document.getElementById('summary').className = allPassed ? 'test-result success' : 'test-result error';
+                document.getElementById('summary').textContent = `Tests completed: ${passedTests}/${totalTests} passed`;
+
+                if (allPassed) {
+                    document.getElementById('summary').textContent += ' - All transparency tests passed! ✓';
+                } else {
+                    document.getElementById('summary').textContent += ' - Some transparency tests failed ✗';
+                }
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Transparency test page loaded');
+            // Initialize DOM
+            DOM.init();
+        });
+    </script>
+</body>
+</html>

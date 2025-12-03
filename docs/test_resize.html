@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Resize Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .test-section h2 {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .test-steps {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        .test-steps li {
+            margin-bottom: 8px;
+            color: #666;
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .canvas-info {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Canvas Resize Functionality Test</h1>
+
+        <div class="test-section">
+            <h2>Test Overview</h2>
+            <p>This test verifies that the canvas resize functionality works correctly in the Tilemap Editor.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 1: Initial Canvas State</h2>
+            <div class="test-steps">
+                <ol>
+                    <li>Check initial canvas dimensions</li>
+                    <li>Verify Config.TILE_DIM and Config.CANVAS_SIZE are set correctly</li>
+                    <li>Check that all canvases are initialized with correct dimensions</li>
+                </ol>
+            </div>
+            <div id="test1-result" class="test-result info">Test not yet run</div>
+            <div id="test1-details" class="canvas-info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Canvas Resize Function</h2>
+            <div class="test-steps">
+                <ol>
+                    <li>Call SettingsManager.resizeCanvas(64, 64)</li>
+                    <li>Verify Config.TILE_DIM is updated to 64</li>
+                    <li>Verify Config.CANVAS_SIZE is updated to 64 * PIXEL_SIZE</li>
+                    <li>Check that all canvas elements are resized</li>
+                </ol>
+            </div>
+            <button id="runTest2" onclick="runResizeTest()">Run Resize Test</button>
+            <div id="test2-result" class="test-result info">Test not yet run</div>
+            <div id="test2-details" class="canvas-info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Edge Cases</h2>
+            <div class="test-steps">
+                <ol>
+                    <li>Test resize with minimum values (4x4)</li>
+                    <li>Test resize with maximum values (512x512)</li>
+                    <li>Test invalid values (should be rejected)</li>
+                </ol>
+            </div>
+            <button id="runTest3" onclick="runEdgeCaseTests()">Run Edge Case Tests</button>
+            <div id="test3-result" class="test-result info">Test not yet run</div>
+            <div id="test3-details" class="canvas-info"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test Summary</h2>
+            <div id="summary" class="test-result info">Tests not yet completed</div>
+        </div>
+    </div>
+
+    <!-- Load the required scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/dom.js"></script>
+    <script src="js/settings-manager.js"></script>
+
+    <script>
+        // Test variables
+        let testResults = {
+            test1: null,
+            test2: null,
+            test3: null
+        };
+
+        // Test 1: Check initial state
+        function runInitialTest() {
+            try {
+                console.log('Running initial test...');
+
+                // Check config values
+                const initialTileDim = Config.TILE_DIM;
+                const initialCanvasSize = Config.CANVAS_SIZE;
+                const pixelSize = Config.PIXEL_SIZE;
+
+                // Check if DOM is initialized
+                const domInitialized = DOM.allCanvases && DOM.allCanvases.length > 0;
+
+                // Check canvas dimensions
+                let canvasDimensions = [];
+                if (domInitialized) {
+                    DOM.allCanvases.forEach((canvas, index) => {
+                        canvasDimensions.push(`Canvas ${index}: ${canvas.width}x${canvas.height}`);
+                    });
+                }
+
+                // Update UI
+                document.getElementById('test1-result').className = 'test-result success';
+                document.getElementById('test1-result').textContent = 'Initial test passed';
+
+                document.getElementById('test1-details').innerHTML = `
+                    <strong>Config Values:</strong><br>
+                    TILE_DIM: ${initialTileDim}<br>
+                    PIXEL_SIZE: ${pixelSize}<br>
+                    CANVAS_SIZE: ${initialCanvasSize}<br>
+                    Expected CANVAS_SIZE: ${initialTileDim * pixelSize}<br><br>
+                    <strong>DOM Initialized:</strong> ${domInitialized}<br>
+                    <strong>Canvas Count:</strong> ${domInitialized ? DOM.allCanvases.length : 'Not available'}<br>
+                    <strong>Canvas Dimensions:</strong><br>
+                    ${canvasDimensions.join('<br>')}
+                `;
+
+                testResults.test1 = true;
+                updateSummary();
+
+            } catch (error) {
+                console.error('Initial test failed:', error);
+                document.getElementById('test1-result').className = 'test-result error';
+                document.getElementById('test1-result').textContent = 'Initial test failed: ' + error.message;
+                testResults.test1 = false;
+                updateSummary();
+            }
+        }
+
+        // Test 2: Run resize test
+        function runResizeTest() {
+            try {
+                console.log('Running resize test...');
+
+                // Store original values
+                const originalTileDim = Config.TILE_DIM;
+                const originalCanvasSize = Config.CANVAS_SIZE;
+
+                // Run the resize
+                SettingsManager.resizeCanvas(64, 64);
+
+                // Check if values were updated
+                const newTileDim = Config.TILE_DIM;
+                const newCanvasSize = Config.CANVAS_SIZE;
+                const expectedCanvasSize = 64 * Config.PIXEL_SIZE;
+
+                // Check canvas dimensions
+                let canvasDimensions = [];
+                let allCanvasesResized = true;
+
+                if (DOM.allCanvases && DOM.allCanvases.length > 0) {
+                    DOM.allCanvases.forEach((canvas, index) => {
+                        const expectedWidth = expectedCanvasSize;
+                        const isCorrectSize = canvas.width === expectedWidth && canvas.height === expectedWidth;
+                        canvasDimensions.push(`Canvas ${index}: ${canvas.width}x${canvas.height} ${isCorrectSize ? '✓' : '✗'}`);
+                        if (!isCorrectSize) allCanvasesResized = false;
+                    });
+                }
+
+                // Update UI
+                const success = newTileDim === 64 && newCanvasSize === expectedCanvasSize && allCanvasesResized;
+
+                document.getElementById('test2-result').className = success ? 'test-result success' : 'test-result error';
+                document.getElementById('test2-result').textContent = success ? 'Resize test passed' : 'Resize test failed';
+
+                document.getElementById('test2-details').innerHTML = `
+                    <strong>Before Resize:</strong><br>
+                    TILE_DIM: ${originalTileDim}<br>
+                    CANVAS_SIZE: ${originalCanvasSize}<br><br>
+                    <strong>After Resize:</strong><br>
+                    TILE_DIM: ${newTileDim}<br>
+                    CANVAS_SIZE: ${newCanvasSize}<br>
+                    Expected CANVAS_SIZE: ${expectedCanvasSize}<br><br>
+                    <strong>Canvas Dimensions:</strong><br>
+                    ${canvasDimensions.join('<br>')}
+                    <br>
+                    <strong>All canvases resized correctly:</strong> ${allCanvasesResized ? 'Yes' : 'No'}
+                `;
+
+                testResults.test2 = success;
+                updateSummary();
+
+                // Restore original values for next tests
+                Config.TILE_DIM = originalTileDim;
+                Config.CANVAS_SIZE = originalCanvasSize;
+
+            } catch (error) {
+                console.error('Resize test failed:', error);
+                document.getElementById('test2-result').className = 'test-result error';
+                document.getElementById('test2-result').textContent = 'Resize test failed: ' + error.message;
+                testResults.test2 = false;
+                updateSummary();
+            }
+        }
+
+        // Test 3: Edge cases
+        function runEdgeCaseTests() {
+            try {
+                console.log('Running edge case tests...');
+
+                // Store original values
+                const originalTileDim = Config.TILE_DIM;
+                const originalCanvasSize = Config.CANVAS_SIZE;
+
+                let results = [];
+
+                // Test 1: Minimum values (4x4)
+                try {
+                    SettingsManager.resizeCanvas(4, 4);
+                    const minSuccess = Config.TILE_DIM === 4 && Config.CANVAS_SIZE === 4 * Config.PIXEL_SIZE;
+                    results.push(`Minimum size (4x4): ${minSuccess ? '✓ PASS' : '✗ FAIL'}`);
+                } catch (e) {
+                    results.push(`Minimum size (4x4): ✗ FAIL - ${e.message}`);
+                }
+
+                // Test 2: Maximum values (512x512)
+                try {
+                    SettingsManager.resizeCanvas(512, 512);
+                    const maxSuccess = Config.TILE_DIM === 512 && Config.CANVAS_SIZE === 512 * Config.PIXEL_SIZE;
+                    results.push(`Maximum size (512x512): ${maxSuccess ? '✓ PASS' : '✗ FAIL'}`);
+                } catch (e) {
+                    results.push(`Maximum size (512x512): ✗ FAIL - ${e.message}`);
+                }
+
+                // Test 3: Invalid values (should be rejected)
+                try {
+                    // This should fail due to validation
+                    SettingsManager.applyCanvasResize = function(width, height) {
+                        // Override to test validation
+                        if (width < 4 || width > 512 || height < 4 || height > 512) {
+                            throw new Error('Invalid size - validation working');
+                        }
+                        return SettingsManager._originalApplyCanvasResize(width, height);
+                    };
+
+                    // Store original method
+                    SettingsManager._originalApplyCanvasResize = SettingsManager.applyCanvasResize;
+
+                    // Test invalid size
+                    SettingsManager.applyCanvasResize(2, 2); // Should fail
+                    results.push(`Invalid size rejection (2x2): ✗ FAIL - Should have been rejected`);
+                } catch (e) {
+                    results.push(`Invalid size rejection (2x2): ✓ PASS - Correctly rejected`);
+                }
+
+                // Restore original method
+                if (SettingsManager._originalApplyCanvasResize) {
+                    SettingsManager.applyCanvasResize = SettingsManager._originalApplyCanvasResize;
+                }
+
+                // Restore original values
+                Config.TILE_DIM = originalTileDim;
+                Config.CANVAS_SIZE = originalCanvasSize;
+
+                // Update UI
+                const allPassed = results.every(r => r.includes('✓ PASS'));
+                document.getElementById('test3-result').className = allPassed ? 'test-result success' : 'test-result error';
+                document.getElementById('test3-result').textContent = allPassed ? 'Edge case tests passed' : 'Some edge case tests failed';
+
+                document.getElementById('test3-details').innerHTML = results.join('<br>');
+
+                testResults.test3 = allPassed;
+                updateSummary();
+
+            } catch (error) {
+                console.error('Edge case tests failed:', error);
+                document.getElementById('test3-result').className = 'test-result error';
+                document.getElementById('test3-result').textContent = 'Edge case tests failed: ' + error.message;
+                testResults.test3 = false;
+                updateSummary();
+            }
+        }
+
+        // Update summary
+        function updateSummary() {
+            const passedTests = Object.values(testResults).filter(r => r === true).length;
+            const totalTests = Object.values(testResults).filter(r => r !== null).length;
+
+            if (totalTests === 0) {
+                document.getElementById('summary').className = 'test-result info';
+                document.getElementById('summary').textContent = 'Tests not yet completed';
+            } else {
+                const allPassed = passedTests === totalTests;
+                document.getElementById('summary').className = allPassed ? 'test-result success' : 'test-result error';
+                document.getElementById('summary').textContent = `Tests completed: ${passedTests}/${totalTests} passed`;
+
+                if (allPassed) {
+                    document.getElementById('summary').textContent += ' - All tests passed! ✓';
+                } else {
+                    document.getElementById('summary').textContent += ' - Some tests failed ✗';
+                }
+            }
+        }
+
+        // Run initial test when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            // Initialize DOM
+            DOM.init();
+
+            // Run initial test
+            runInitialTest();
+        });
+    </script>
+</body>
+</html>

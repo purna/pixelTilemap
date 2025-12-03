@@ -155,8 +155,12 @@ handleDrawing(e) {
             ctx.globalAlpha = opacity;
         }
         
-        ctx.fillStyle = color;
-        ctx.fillRect(screenX, screenY, Config.PIXEL_SIZE, Config.PIXEL_SIZE);
+        if (color === 'transparent') {
+            ctx.clearRect(screenX, screenY, Config.PIXEL_SIZE, Config.PIXEL_SIZE);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(screenX, screenY, Config.PIXEL_SIZE, Config.PIXEL_SIZE);
+        }
         ctx.restore();
     },
     
@@ -169,8 +173,8 @@ handleDrawing(e) {
         DOM.editorCtx.clearRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
         
         // Composite all visible layers onto the main editor canvas
-        // Draw in reverse order (bottom to top) so higher layers appear on top
-        State.layers.slice().reverse().forEach(layer => {
+        // Draw in normal order so bottom layers in UI appear on bottom in canvas
+        State.layers.forEach(layer => {
             if (layer.visible) {
                 DOM.editorCtx.globalAlpha = layer.opacity;
                 DOM.editorCtx.drawImage(layer.canvas, 0, 0);
@@ -188,13 +192,11 @@ handleDrawing(e) {
     },
     
     clearCanvas() {
-        // Clear all canvases to white (erase color)
-        DOM.editorCtx.fillStyle = Config.ERASE_COLOR;
-        DOM.editorCtx.fillRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
-        
+        // Clear all canvases to transparent
+        DOM.editorCtx.clearRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
+
         DOM.previewContexts.forEach(ctx => {
-            ctx.fillStyle = Config.ERASE_COLOR;
-            ctx.fillRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
+            ctx.clearRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
         });
         
         State.markUnsaved();

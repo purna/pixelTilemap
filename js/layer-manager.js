@@ -86,17 +86,41 @@ const LayerManager = {
         State.setActiveLayer(index);
         this.renderLayers();
         console.log('Active layer index after setting:', State.activeLayerIndex);
+
+        // Update eye icon color for the newly active layer
+        const layerItem = DOM.elements.layersList.querySelector(`[data-index="${index}"]`);
+        if (layerItem) {
+            const visibilityBtn = layerItem.querySelector('.visibility-btn i');
+            if (visibilityBtn) {
+                visibilityBtn.style.color = 'var(--accent-primary)';
+            }
+        }
     },
     
     toggleLayerVisibility(index) {
         console.log('Toggle layer visibility called for index:', index);
         console.log('Current layer visibility before toggle:', State.layers[index].visible);
-        
+
         State.toggleLayerVisibility(index);
-        
+
         console.log('Layer visibility after toggle:', State.layers[index].visible);
         this.renderLayers();
         State.markUnsaved();
+
+        // Update the visibility icon immediately
+        const layerItem = DOM.elements.layersList.querySelector(`[data-index="${index}"]`);
+        if (layerItem) {
+            const visibilityBtn = layerItem.querySelector('.visibility-btn i');
+            if (visibilityBtn) {
+                visibilityBtn.className = `fas ${State.layers[index].visible ? 'fa-eye' : 'fa-eye-slash'}`;
+                // Set theme color for active layer's eye icon
+                if (index === State.activeLayerIndex) {
+                    visibilityBtn.style.color = 'var(--accent-primary)';
+                } else {
+                    visibilityBtn.style.color = '';
+                }
+            }
+        }
     },
     
     duplicateLayer(index) {
@@ -131,8 +155,14 @@ const LayerManager = {
             // Don't re-render all layers, just update the name display
             const layerItem = DOM.elements.layersList.querySelector(`[data-index="${index}"]`);
             if (layerItem) {
-                const layerName = layerItem.querySelector('.layer-name');
-                layerName.textContent = newName;
+                const layerNameLabel = layerItem.querySelector('.layer-name-label');
+                const layerNameInput = layerItem.querySelector('.layer-name-input');
+                if (layerNameLabel) {
+                    layerNameLabel.textContent = newName;
+                }
+                if (layerNameInput) {
+                    layerNameInput.value = newName;
+                }
             }
             State.markUnsaved();
         }
@@ -285,6 +315,14 @@ const LayerManager = {
         if (!e.target.closest('.layer-controls')) {
             console.log('Setting active layer to index:', index);
             this.setActiveLayer(index);
+            // Update eye icon color for the newly active layer
+            const layerItem = DOM.elements.layersList.querySelector(`[data-index="${index}"]`);
+            if (layerItem) {
+                const visibilityBtn = layerItem.querySelector('.visibility-btn i');
+                if (visibilityBtn) {
+                    visibilityBtn.style.color = 'var(--accent-primary)';
+                }
+            }
         }
     },
     

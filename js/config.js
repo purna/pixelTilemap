@@ -10,7 +10,7 @@ const Config = {
     // Drawing settings
     DEFAULT_BRUSH_SIZE: 0,
     DRAW_COLOR: '#282828', // Dark gray for brush
-    ERASE_COLOR: '#ffffff', // White for eraser
+    ERASE_COLOR: 'transparent', // Transparent for eraser
     
     // UI settings
     PALETTE_SIZE: 20,

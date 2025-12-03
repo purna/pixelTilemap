@@ -43,9 +43,8 @@ const DOM = {
                     this.previewContexts.push(ctx);
                 }
 
-                // Clear canvas to white (erase color)
-                ctx.fillStyle = Config.ERASE_COLOR;
-                ctx.fillRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
+                // Clear canvas to transparent
+                ctx.clearRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
             }
         }
 
@@ -135,7 +134,10 @@ const DOM = {
                 <div class="layer-preview">
                     <canvas width="32" height="32"></canvas>
                 </div>
-                <div class="layer-name" contenteditable="false">${layer.name}</div>
+                <div class="layer-name-container">
+                    <label class="layer-name-label" for="layer-name-${index}">${layer.name}</label>
+                    <input type="text" id="layer-name-${index}" class="layer-name-input" value="${layer.name}" style="display: none;">
+                </div>
             </div>
             <div class="layer-controls">
                 <button class="visibility-btn" title="Toggle Visibility">
@@ -148,64 +150,102 @@ const DOM = {
         `;
 
         // Add double-click handler for renaming
-        const layerName = layerItem.querySelector('.layer-name');
-        layerName.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            DOM.startLayerRename(e.target, index);
-        });
+        const layerNameLabel = layerItem.querySelector('.layer-name-label');
+        const layerNameInput = layerItem.querySelector('.layer-name-input');
+        if (layerNameLabel && layerNameInput) {
+            layerNameLabel.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                DOM.startLayerRename(layerNameLabel, layerNameInput, index);
+            });
+        }
+
+        // Add click handler for visibility button
+        const visibilityBtn = layerItem.querySelector('.visibility-btn');
+        if (visibilityBtn) {
+            visibilityBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof LayerManager !== 'undefined') {
+                    const layerIndex = parseInt(layerItem.dataset.index);
+                    LayerManager.toggleLayerVisibility(layerIndex);
+                }
+            });
+        }
 
         return layerItem;
     },
 
-    startLayerRename(nameElement, layerIndex) {
-        const currentName = nameElement.textContent;
-        nameElement.contenteditable = true;
-        nameElement.focus();
+    startLayerRename(nameLabel, nameInput, layerIndex) {
+        const currentName = nameLabel.textContent;
 
-        // Select all text
-        const range = document.createRange();
-        range.selectNodeContents(nameElement);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+        // Show the input field and hide the label
+        nameLabel.style.display = 'none';
+        nameInput.style.display = 'inline-block';
 
-        const finishRename = (commit) => {
-            nameElement.contenteditable = false;
-            nameElement.removeEventListener('blur', blurHandler);
-            nameElement.removeEventListener('keydown', keydownHandler);
+        // Set focus with a small delay to ensure it works
+        setTimeout(() => {
+            nameInput.focus();
+            nameInput.select();
 
-            if (commit) {
-                const newName = nameElement.textContent.trim();
-                if (newName && newName !== currentName) {
-                    if (typeof LayerManager !== 'undefined') {
-                        LayerManager.renameLayer(layerIndex, newName);
+            // Prevent focus loss by preventing mouse events during editing
+            const preventFocusLoss = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
+
+            // Add temporary mouse event prevention
+            nameInput.addEventListener('mousedown', preventFocusLoss, true);
+            nameInput.addEventListener('mouseup', preventFocusLoss, true);
+            nameInput.addEventListener('click', preventFocusLoss, true);
+
+            const finishRename = (commit) => {
+                // Remove temporary mouse event prevention
+                nameInput.removeEventListener('mousedown', preventFocusLoss, true);
+                nameInput.removeEventListener('mouseup', preventFocusLoss, true);
+                nameInput.removeEventListener('click', preventFocusLoss, true);
+
+                // Hide the input field and show the label
+                nameInput.style.display = 'none';
+                nameLabel.style.display = 'inline-block';
+
+                nameInput.removeEventListener('blur', blurHandler);
+                nameInput.removeEventListener('keydown', keydownHandler);
+
+                if (commit) {
+                    const newName = nameInput.value.trim();
+                    if (newName && newName !== currentName) {
+                        if (typeof LayerManager !== 'undefined') {
+                            LayerManager.renameLayer(layerIndex, newName);
+                            nameLabel.textContent = newName;
+                        } else {
+                            // Added notification for debugging if LayerManager is missing
+                            DOM.showNotification('Error: LayerManager not found. Rename failed to save.', 'error');
+                            nameLabel.textContent = currentName; // Revert name if manager is missing
+                        }
                     } else {
-                        // Added notification for debugging if LayerManager is missing
-                        DOM.showNotification('Error: LayerManager not found. Rename failed to save.', 'error');
-                        nameElement.textContent = currentName; // Revert name if manager is missing
+                        nameLabel.textContent = currentName;
                     }
                 } else {
-                    nameElement.textContent = currentName;
+                    nameLabel.textContent = currentName;
                 }
-            } else {
-                nameElement.textContent = currentName;
-            }
-        };
+            };
 
-        const blurHandler = () => finishRename(true);
+            const blurHandler = () => finishRename(true);
 
-        const keydownHandler = (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                finishRename(true);
-            } else if (e.key === 'Escape') {
-                e.preventDefault();
-                finishRename(false);
-            }
-        };
+            const keydownHandler = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    finishRename(true);
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    finishRename(false);
+                }
+            };
 
-        nameElement.addEventListener('blur', blurHandler);
-        nameElement.addEventListener('keydown', keydownHandler);
+            nameInput.addEventListener('blur', blurHandler);
+            nameInput.addEventListener('keydown', keydownHandler);
+        }, 50);
     },
 
     showNotification(message, type = 'info') {

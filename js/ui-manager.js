@@ -30,10 +30,12 @@ const UIManager = {
                 icon.className = 'fas fa-chevron-left';
                 toggleBtn.style.right = '0';
                 mainContainer?.classList.add('panel-closed');
+                panel.style.display = 'none';
             } else {
                 icon.className = 'fas fa-chevron-right';
-                toggleBtn.style.right = '280px';
+                toggleBtn.style.right = '300px';
                 mainContainer?.classList.remove('panel-closed');
+                panel.style.display = 'flex';
             }
             
             // Save state
@@ -42,18 +44,19 @@ const UIManager = {
     },
 
     setupContextSwitching() {
-        // 1. Listen for Drawing Tool Clicks (Pencil, Brush, etc) - exclude Layers/Canvas/Settings buttons
-        const drawingToolBtns = document.querySelectorAll('[data-tool]:not(#layersBtn):not(#canvasBtn):not(#settingsBtn)');
+        // 1. Listen for Drawing Tool Clicks (Pencil, Brush, etc) - exclude Layers/Canvas/Settings/Tilemap buttons
+        const drawingToolBtns = document.querySelectorAll('[data-tool]:not(#layersBtn):not(#canvasBtn):not(#settingsBtn):not(#tilemapBtn)');
         drawingToolBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 // Determine tool name from data attribute
                 const toolName = btn.getAttribute('data-tool');
                 this.updatePanelForTool(toolName);
                 
-                // Remove active styling from Layers/Canvas/Settings buttons
+                // Remove active styling from Layers/Canvas/Settings/Tilemap buttons
                 document.getElementById('layersBtn')?.classList.remove('active');
                 document.getElementById('canvasBtn')?.classList.remove('active');
                 document.getElementById('settingsBtn')?.classList.remove('active');
+                document.getElementById('tilemapBtn')?.classList.remove('active');
             });
         });
 
@@ -63,8 +66,27 @@ const UIManager = {
             layersBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                this.showPanelSections(['panel-layers']);
+                // Toggle the layers panel visibility with animation
+                const layersPanel = document.getElementById('panel-layers');
+                if (layersPanel) {
+                    const isHidden = layersPanel.classList.contains('hidden');
+                    if (isHidden) {
+                        layersPanel.classList.remove('hidden');
+                        layersPanel.classList.add('slide-up');
+                    } else {
+                        layersPanel.classList.add('hidden');
+                        layersPanel.classList.remove('slide-up');
+                    }
+                }
                 this.setActiveSidebarButton('layersBtn');
+                // Also ensure the panel is open if we're showing layers
+                const panel = document.getElementById('side-panel');
+                if (panel && panel.classList.contains('closed')) {
+                    const toggleBtn = document.getElementById('panel-toggle');
+                    if (toggleBtn) {
+                        toggleBtn.click();
+                    }
+                }
             });
         }
 
@@ -74,8 +96,57 @@ const UIManager = {
             canvasBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                this.showPanelSections(['panel-tool-canvas']);
+                // Toggle the canvas panel visibility with animation
+                const canvasPanel = document.getElementById('panel-tool-canvas');
+                if (canvasPanel) {
+                    const isHidden = canvasPanel.classList.contains('hidden');
+                    if (isHidden) {
+                        canvasPanel.classList.remove('hidden');
+                        canvasPanel.classList.add('slide-up');
+                    } else {
+                        canvasPanel.classList.add('hidden');
+                        canvasPanel.classList.remove('slide-up');
+                    }
+                }
                 this.setActiveSidebarButton('canvasBtn');
+                // Also ensure the panel is open if we're showing canvas
+                const panel = document.getElementById('side-panel');
+                if (panel && panel.classList.contains('closed')) {
+                    const toggleBtn = document.getElementById('panel-toggle');
+                    if (toggleBtn) {
+                        toggleBtn.click();
+                    }
+                }
+            });
+        }
+
+        // 4. Listen for Tilemap Button (prevent event bubbling)
+        const tilemapBtn = document.getElementById('tilemapBtn');
+        if (tilemapBtn) {
+            tilemapBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Toggle the tilemap panel visibility with animation
+                const tilemapPanel = document.getElementById('panel-tilemap');
+                if (tilemapPanel) {
+                    const isHidden = tilemapPanel.classList.contains('hidden');
+                    if (isHidden) {
+                        tilemapPanel.classList.remove('hidden');
+                        tilemapPanel.classList.add('slide-up');
+                    } else {
+                        tilemapPanel.classList.add('hidden');
+                        tilemapPanel.classList.remove('slide-up');
+                    }
+                }
+                this.setActiveSidebarButton('tilemapBtn');
+                // Also ensure the panel is open if we're showing tilemap
+                const panel = document.getElementById('side-panel');
+                if (panel && panel.classList.contains('closed')) {
+                    const toggleBtn = document.getElementById('panel-toggle');
+                    if (toggleBtn) {
+                        toggleBtn.click();
+                    }
+                }
             });
         }
     },
@@ -240,7 +311,8 @@ const UIManager = {
             'panel-palette',
             'panel-tool-options',
             'panel-layers',
-            'panel-tool-canvas'
+            'panel-tool-canvas',
+            'panel-tilemap'
         ];
 
         allSections.forEach(id => {
@@ -248,12 +320,14 @@ const UIManager = {
             if (el) {
                 if (idsToShow.includes(id)) {
                     el.classList.remove('hidden');
+                    el.classList.add('slide-up');
                 } else {
                     el.classList.add('hidden');
+                    el.classList.remove('slide-up');
                 }
             }
         });
-        
+
         // Ensure panel is open if the user clicks a specific view
         const panel = document.getElementById('side-panel');
         if (panel && panel.classList.contains('closed')) {
@@ -269,9 +343,13 @@ const UIManager = {
      * Visual helper to highlight Layers/Settings buttons
      */
     setActiveSidebarButton(activeId) {
-        // Deactivate tools (visually only - assumes ToolManager handles tool state logic separately)
-        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        
+        // Only deactivate sidebar buttons (layers, canvas, settings, tilemap), not drawing tools
+        const sidebarButtons = ['layersBtn', 'canvasBtn', 'settingsBtn', 'tilemapBtn'];
+        sidebarButtons.forEach(buttonId => {
+            const btn = document.getElementById(buttonId);
+            if (btn) btn.classList.remove('active');
+        });
+
         // Activate the specific button
         const btn = document.getElementById(activeId);
         if (btn) btn.classList.add('active');
@@ -446,13 +524,15 @@ const UIManager = {
                 if (panel && toggleBtn && toggleIcon) {
                     if (!isOpen) {
                         panel.classList.add('closed');
+                        panel.style.display = 'none';
                         toggleIcon.className = 'fas fa-chevron-left';
                         toggleBtn.style.right = '0';
                         mainContainer?.classList.add('panel-closed');
                     } else {
                         panel.classList.remove('closed');
+                        panel.style.display = 'flex';
                         toggleIcon.className = 'fas fa-chevron-right';
-                        toggleBtn.style.right = '280px';
+                        toggleBtn.style.right = '300px';
                         mainContainer?.classList.remove('panel-closed');
                     }
                 }

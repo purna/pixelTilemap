@@ -22,8 +22,8 @@
         </div>
 
         <div class="header-controls">
-            <button id="undoBtn" class="btn icon-only" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
-            <button id="redoBtn" class="btn icon-only" title="Redo (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+            <button id="undoBtn" class="btn icon-only" title="Undo (Ctrl+Z)" data-tooltip="**Undo**\n--Reverse last action--\nShortcut: `Ctrl+Z`"><i class="fas fa-undo"></i></button>
+            <button id="redoBtn" class="btn icon-only" title="Redo (Ctrl+Y)" data-tooltip="**Redo**\n--Restore undone action--\nShortcut: `Ctrl+Y`"><i class="fas fa-redo"></i></button>
 
             <div class="separator" style="height: 20px; width: 1px; margin: 0 10px;"></div>
 
@@ -39,9 +39,15 @@
 
             <div class="separator" style="height: 20px; width: 1px; margin: 0 10px;"></div>
 
-            <button id="saveBtn" class="btn primary"><i class="fas fa-save"></i> Save</button>
-            <button id="loadBtn" class="btn"><i class="fas fa-folder-open"></i> Load</button>
-            <button id="exportBtn" class="btn"><i class="fas fa-file-export"></i> Export</button>
+            <button id="saveBtn" class="btn primary" data-tooltip="**Save Project**\n--Save your work--\n\nSave your current tile map and settings to a file">
+                <i class="fas fa-save"></i> Save
+            </button>
+            <button id="loadBtn" class="btn" data-tooltip="**Load Project**\n--Open saved work--\n\nLoad a previously saved tile map project">
+                <i class="fas fa-folder-open"></i> Load
+            </button>
+            <button id="exportBtn" class="btn" data-tooltip="**Export**\n--Export your tiles--\n\nExport your tile maps as image files">
+                <i class="fas fa-file-export"></i> Export
+            </button>
         </div>
     </header>
 
@@ -50,39 +56,46 @@
 
         <!-- LEFT TOOLBAR -->
         <aside class="toolbar" id="tool-buttons">
-            <button class="tool-btn active" data-tool="pencil" title="Pencil (P)">
+            <button class="tool-btn active" data-tool="pencil" title="Pencil (P)" data-tooltip="**Pencil Tool**\n--Freehand drawing--\nShortcut: P">
                 <i class="fas fa-pencil-alt"></i>
                 <span>Pencil</span>
             </button>
-            <button class="tool-btn" data-tool="brush" title="Brush (B)">
+            <button class="tool-btn" data-tool="brush" title="Brush (B)" data-tooltip="**Brush Tool**\n--Smooth painting--\nShortcut: B">
                 <i class="fas fa-paint-brush"></i>
                 <span>Brush</span>
             </button>
-            <button class="tool-btn" data-tool="eraser" title="Eraser (E)">
+            <button class="tool-btn" data-tool="eraser" title="Eraser (E)" data-tooltip="**Eraser Tool**\n--Remove pixels--\nShortcut: E">
                 <i class="fas fa-eraser"></i>
                 <span>Eraser</span>
             </button>
             <div class="separator"></div>
-            <button class="tool-btn" data-tool="eyedropper" title="Color Picker (I)">
+            <button class="tool-btn" data-tool="eyedropper" title="Color Picker (I)" data-tooltip="**Color Picker**\n--Sample colors--\nShortcut: I">
                 <i class="fas fa-eye-dropper"></i>
                 <span>Picker</span>
             </button>
-            <div class="separator"></div>
-            <button class="tool-btn" id="layersBtn" title="Layers (L)">
-                <i class="fas fa-layer-group"></i>
-                <span>Layers</span>
-            </button>
+        
             <div class="toolbar-spacer"></div>
 
             
-            <button class="canvas-btn" id="canvasBtn" title="Canvas">
+            <button class="canvas-btn" id="canvasBtn" title="Canvas" data-tooltip="**Canvas Settings**\n--Configure canvas size--\n\n• Set tile dimensions\n• Apply size changes\n• Resize canvas\n\nAdjust the pixel resolution of your tiles">
                 <i class="fas fa-layer-group"></i>
                 <span>Canvas</span>
             </button>
+             <div class="separator"></div>
+            <button class="tool-btn" id="layersBtn" title="Layers (L)" data-tooltip="**Layer Management**\n--Organize your artwork--\n\n• Add new layers\n• Delete layers\n• Toggle visibility\n• Reorder layers\n\nCreate complex artwork with multiple layers">
+                <i class="fas fa-layer-group"></i>
+                <span>Layers</span>
+            </button>
             <div class="separator"></div>
-            <button class="tool-btn" id="settingsBtn" title="Settings">
+            <button class="tool-btn" id="settingsBtn" title="Settings" data-tooltip="**Settings**\n--Configure preferences--\n\n• Grid visibility\n• Background color\n• Canvas size\n• Auto-save options\n\nToggle tooltips on/off here">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
+            </button>
+            <div class="separator"></div>
+
+            <button class="tool-btn" id="tilemapBtn" title="Tilemap" data-tooltip="**Tilemap Manager**\n--Tile pattern editor--\n\n• View 3x3 tile grid\n• Select active tiles\n• Edit seamless patterns\n\nCreate repeating tile patterns">
+                <i class="fas fa-th"></i>
+                <span>Tilemap</span>
             </button>
         </aside>
 
@@ -237,14 +250,61 @@
                     </div>
             </div>
 
+            <!-- Tilemap Panel Section -->
+            <div id="panel-tilemap" class="panel-section hidden">
+                <div class="section-title">
+                    <span>Tilemap Manager</span>
+                    <button id="tilemapSettingsBtn" title="Tilemap Settings"
+                        style="background:none; border:none; color:var(--accent-primary); cursor:pointer;">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+                <div class="tilemap-container">
+                    <div class="tilemap-grid" id="tilemapGrid">
+                        <!-- 3x3 grid of tilemap squares connected to actual canvases -->
+                        <div class="tilemap-square" data-row="0" data-col="0" data-canvas="preview-0-0">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square" data-row="0" data-col="1" data-canvas="preview-0-1">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square" data-row="0" data-col="2" data-canvas="preview-0-2">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square" data-row="1" data-col="0" data-canvas="preview-1-0">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square center" data-row="1" data-col="1" data-canvas="editor-canvas">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square" data-row="1" data-col="2" data-canvas="preview-1-2">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square" data-row="2" data-col="0" data-canvas="preview-2-0">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square" data-row="2" data-col="1" data-canvas="preview-2-1">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                        <div class="tilemap-square" data-row="2" data-col="2" data-canvas="preview-2-2">
+                            <canvas width="32" height="32"></canvas>
+                        </div>
+                    </div>
+                    <div class="tilemap-info">
+                        <p style="font-size:10px; color:var(--text-secondary); margin-top:8px; text-align:center;">
+                            Select a tile to make it active
+                        </p>
+                    </div>
+                </div>
+            </div>
 
         </aside>
 
-        <!-- Floating Toggle -->
-        <div id="panel-toggle" title="Toggle Panel">
-            <i class="fas fa-chevron-right"></i>
-        </div>
+    </div>
 
+    <!-- Floating Toggle - moved outside main-container -->
+    <div id="panel-toggle" title="Toggle Panel">
+        <i class="fas fa-chevron-right"></i>
     </div>
 
     <!-- SETTINGS MODAL -->
@@ -288,10 +348,41 @@
 
                 <div class="property-group">
                     <label class="property-label">
-                        Default Background Color
+                        Default Background
                     </label>
-                    <input type="color" id="setting-bg-color" value="#ffffff" 
-                           style="width:40px; height:24px; padding:0; border:1px solid var(--border-color); background:none; cursor:pointer; vertical-align:middle; margin-left:10px;">
+                    <div class="bg-control-container">
+                        <!-- Background mode toggle -->
+                        <div class="bg-mode-toggle" role="tablist" aria-label="Background mode">
+                            <button class="bg-mode-btn active" data-mode="color" role="tab" aria-selected="true">
+                                <i class="fas fa-palette"></i>
+                                <span>Color</span>
+                            </button>
+                            <button class="bg-mode-btn" data-mode="transparent" role="tab" aria-selected="false">
+                                <i class="fas fa-eye-slash"></i>
+                                <span>Transparent</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Color picker section -->
+                        <div class="bg-color-section" id="bg-color-section">
+                            <div class="color-picker-group">
+                                <input type="color" id="setting-bg-color" value="#ffffff" 
+                                       class="bg-color-input" aria-label="Background color">
+                                <div class="color-preview" id="color-preview">
+                                    <div class="preview-box" id="preview-box"></div>
+                                    <span class="color-value" id="color-value">#ffffff</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Transparent preview section -->
+                        <div class="bg-transparent-section hidden" id="bg-transparent-section">
+                            <div class="transparent-preview">
+                                <div class="transparent-grid"></div>
+                                <span class="transparent-label">Background will be transparent</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                  <div class="property-group">
@@ -333,12 +424,16 @@
     <script src="js/state.js"></script>
     <script src="js/dom.js"></script>
 
+    <!-- UI Components -->
+    <script src="js/tooltip.js"></script>
+
     <!-- Specialized modules -->
     <script src="js/tilemap-core.js"></script>
     <script src="js/palette-manager.js"></script>
     <script src="js/layer-manager.js"></script>
     <script src="js/tool-manager.js"></script>
     <script src="js/file-manager.js"></script>
+    <script src="js/tilemap-manager.js"></script>
     <script src="js/settings-manager.js"></script>
     <script src="js/zoom-manager.js"></script>
 
