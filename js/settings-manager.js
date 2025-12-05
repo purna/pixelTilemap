@@ -84,7 +84,7 @@ const SettingsManager = {
     },
 
     openSettings() {
-        const modal = document.getElementById('settings-modal');
+        const modal = document.getElementById('unified-settings-modal');
         if (!modal) {
             console.error('Settings modal not found in HTML');
             return;
@@ -163,7 +163,7 @@ const SettingsManager = {
     },
 
     closeSettings() {
-        const modal = document.getElementById('settings-modal');
+        const modal = document.getElementById('unified-settings-modal');
         if (modal) {
             modal.classList.remove('open');
         }
@@ -267,24 +267,18 @@ const SettingsManager = {
     },
 
     setupModalEventListeners() {
-        const modal = document.getElementById('settings-modal');
+        const modal = document.getElementById('unified-settings-modal');
         if (!modal) return;
 
         // X close button
-        const xCloseBtn = document.getElementById('btn-settings-x');
+        const xCloseBtn = document.getElementById('btn-settings-close');
         if (xCloseBtn) {
             xCloseBtn.addEventListener('click', () => {
                 this.closeSettings();
             });
         }
 
-        // Close button
-        const closeBtn = document.getElementById('btn-settings-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                this.closeSettings();
-            });
-        }
+        // Close button - already handled above
 
         // Save button
         const saveBtn = document.getElementById('btn-settings-save');
@@ -357,8 +351,45 @@ const SettingsManager = {
                 this.settings.backgroundColor = 'transparent';
                 this.applyBackgroundColor('transparent');
                 this.saveSettingsToStorage();
-                if (typeof InputHandler !== 'undefined') {
-                    InputHandler.showNotification('Background color removed (transparent)', 'success');
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.success('Background color removed (transparent)');
+                }
+            });
+        }
+
+        // Export Defaults button
+        const exportSettingsBtn = document.getElementById('exportSettingsBtn');
+        if (exportSettingsBtn) {
+            exportSettingsBtn.addEventListener('click', () => {
+                this.exportSettings();
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.success('Settings exported as defaults');
+                }
+            });
+        }
+
+        // Save to Browser button
+        const saveToBrowserBtn = document.getElementById('saveToBrowserBtn');
+        if (saveToBrowserBtn) {
+            saveToBrowserBtn.addEventListener('click', () => {
+                this.saveSettingsToStorage();
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.success('Settings saved to browser storage');
+                }
+            });
+        }
+
+        // Load from Browser button
+        const loadFromBrowserBtn = document.getElementById('loadFromBrowserBtn');
+        if (loadFromBrowserBtn) {
+            loadFromBrowserBtn.addEventListener('click', () => {
+                this.loadSettings();
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.success('Settings loaded from browser storage');
                 }
             });
         }
@@ -413,8 +444,9 @@ const SettingsManager = {
         // Save to localStorage
         this.saveSettingsToStorage();
 
-        if (typeof InputHandler !== 'undefined') {
-            InputHandler.showNotification('Settings saved successfully', 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success('Settings saved successfully');
         }
     },
 
@@ -432,8 +464,9 @@ const SettingsManager = {
 
         // Validate input ranges
         if (newWidth < 4 || newWidth > 1024) {
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Canvas size must be between 4 and 1024 pixels', 'error');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.error('Canvas size must be between 4 and 1024 pixels');
             }
             return;
         }
@@ -447,8 +480,9 @@ const SettingsManager = {
         // Save to storage
         this.saveSettingsToStorage();
 
-        if (typeof InputHandler !== 'undefined') {
-            InputHandler.showNotification(`Canvas resized to ${newWidth}×${newHeight}`, 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success(`Canvas resized to ${newWidth}×${newHeight}`);
         }
     },
 
@@ -502,8 +536,9 @@ const SettingsManager = {
             // Save to localStorage
             this.saveSettingsToStorage();
 
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Settings reset to defaults', 'info');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.info('Settings reset to defaults');
             }
         }
     },
@@ -614,8 +649,9 @@ const SettingsManager = {
 
         URL.revokeObjectURL(url);
 
-        if (typeof InputHandler !== 'undefined') {
-            InputHandler.showNotification('Settings exported successfully', 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success('Settings exported successfully');
         }
     },
 
@@ -654,7 +690,10 @@ const SettingsManager = {
             const message = mode === 'transparent' ? 
                 'Background set to transparent' : 
                 'Background color mode selected';
-            InputHandler.showNotification(message, 'success');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.success(message);
+            }
         }
     },
 

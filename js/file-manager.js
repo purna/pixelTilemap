@@ -38,14 +38,16 @@ const FileManager = {
             
             this.downloadFile(jsonString, 'tilemap-project.json', 'application/json');
             State.markSaved();
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Project saved successfully', 'success');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.success('Project saved successfully');
             }
             
         } catch (error) {
             console.error('Save error:', error);
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Error saving project', 'error');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.error('Error saving project');
             }
         }
     },
@@ -63,13 +65,15 @@ const FileManager = {
             try {
                 const projectData = JSON.parse(e.target.result);
                 this.loadProjectData(projectData);
-                if (typeof InputHandler !== 'undefined') {
-                    InputHandler.showNotification('Project loaded successfully', 'success');
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.success('Project loaded successfully');
                 }
             } catch (error) {
                 console.error('Load error:', error);
-                if (typeof InputHandler !== 'undefined') {
-                    InputHandler.showNotification('Error loading project: Invalid file format', 'error');
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.error('Error loading project: Invalid file format');
                 }
             }
         };
@@ -142,14 +146,16 @@ const FileManager = {
             const filename = `tilemap-export-${timestamp}.${format}`;
             
             this.downloadDataURL(dataURL, filename);
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification(`Project exported as ${format.toUpperCase()}`, 'success');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.success(`Project exported as ${format.toUpperCase()}`);
             }
             
         } catch (error) {
             console.error('Export error:', error);
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Error exporting project', 'error');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.error('Error exporting project');
             }
         }
     },
@@ -176,14 +182,16 @@ const FileManager = {
             const filename = `tilemap-spritesheet-${timestamp}.png`;
             
             this.downloadDataURL(dataURL, filename);
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Sprite sheet exported', 'success');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.success('Sprite sheet exported');
             }
             
         } catch (error) {
             console.error('Sprite sheet export error:', error);
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Error exporting sprite sheet', 'error');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.error('Error exporting sprite sheet');
             }
         }
     },
@@ -245,8 +253,9 @@ const FileManager = {
                         TilemapCore.updatePreviews();
                         
                         State.markUnsaved();
-                        if (typeof InputHandler !== 'undefined') {
-                            InputHandler.showNotification('Image imported successfully', 'success');
+                        if (typeof Notifications !== 'undefined') {
+                            const notifications = new Notifications();
+                            notifications.success('Image imported successfully');
                         }
                     };
                     

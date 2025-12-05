@@ -57,27 +57,41 @@ const LayerManager = {
     
     addLayer(name = null) {
         if (State.layers.length >= Config.MAX_LAYERS) {
-            InputHandler.showNotification(`Maximum ${Config.MAX_LAYERS} layers allowed`, 'warning');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.warning(`Maximum ${Config.MAX_LAYERS} layers allowed`);
+            }
             return;
         }
-        
+
         const layerName = name || `Layer ${State.layers.length + 1}`;
+        console.log('LayerManager.addLayer called with name:', layerName);
         State.addLayer(layerName);
         this.renderLayers();
-        InputHandler.showNotification(`Layer "${layerName}" added`, 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success(`Layer "${layerName}" added`);
+        }
         State.markUnsaved();
     },
     
     removeLayer(index) {
         if (State.layers.length <= 1) {
-            InputHandler.showNotification('Cannot delete the last layer', 'warning');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.warning('Cannot delete the last layer');
+            }
             return;
         }
-        
+
         const layerName = State.layers[index].name;
+        console.log('LayerManager.removeLayer called with index:', index, 'name:', layerName);
         State.removeLayer(index);
         this.renderLayers();
-        InputHandler.showNotification(`Layer "${layerName}" deleted`, 'info');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.info(`Layer "${layerName}" deleted`);
+        }
         State.markUnsaved();
     },
     
@@ -125,10 +139,13 @@ const LayerManager = {
     
     duplicateLayer(index) {
         if (State.layers.length >= Config.MAX_LAYERS) {
-            InputHandler.showNotification(`Maximum ${Config.MAX_LAYERS} layers allowed`, 'warning');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.warning(`Maximum ${Config.MAX_LAYERS} layers allowed`);
+            }
             return;
         }
-        
+
         const sourceLayer = State.layers[index];
         const newLayer = {
             id: Date.now(),
@@ -137,15 +154,18 @@ const LayerManager = {
             opacity: sourceLayer.opacity,
             canvas: State.createLayerCanvas()
         };
-        
+
         // Copy canvas content
         const sourceCtx = sourceLayer.canvas.getContext('2d');
         const destCtx = newLayer.canvas.getContext('2d');
         destCtx.drawImage(sourceLayer.canvas, 0, 0);
-        
+
         State.layers.splice(index + 1, 0, newLayer);
         this.renderLayers();
-        InputHandler.showNotification(`Layer "${sourceLayer.name}" duplicated`, 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success(`Layer "${sourceLayer.name}" duplicated`);
+        }
         State.markUnsaved();
     },
     
@@ -305,7 +325,8 @@ const LayerManager = {
         if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
             e.stopPropagation();
             e.preventDefault();
-            if (confirm(`Delete layer "${State.layers[index].name}"?`)) {
+            // Check if the layer exists before trying to access its name
+            if (State.layers[index] && confirm(`Delete layer "${State.layers[index].name}"?`)) {
                 this.removeLayer(index);
             }
             return;
@@ -371,7 +392,8 @@ const LayerManager = {
             { text: 'Move Down', action: () => this.moveLayer(index, 'down'), disabled: index === State.layers.length - 1 },
             { text: '---', separator: true },
             { text: 'Delete Layer', action: () => {
-                if (confirm(`Delete layer "${State.layers[index].name}"?`)) {
+                // Check if the layer exists before trying to access its name
+                if (State.layers[index] && confirm(`Delete layer "${State.layers[index].name}"?`)) {
                     this.removeLayer(index);
                 }
             }, danger: true }

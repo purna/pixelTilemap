@@ -169,26 +169,31 @@ handleDrawing(e) {
     },
     
     updatePreviews() {
+        console.log(`Updating previews - ${State.layers.length} layers available`);
+
         // Clear the main editor canvas first
         DOM.editorCtx.clearRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
-        
+
         // Composite all visible layers onto the main editor canvas
         // Draw in normal order so bottom layers in UI appear on bottom in canvas
-        State.layers.forEach(layer => {
+        State.layers.forEach((layer, index) => {
             if (layer.visible) {
+                console.log(`Compositing layer ${index}: ${layer.name} (opacity: ${layer.opacity})`);
                 DOM.editorCtx.globalAlpha = layer.opacity;
                 DOM.editorCtx.drawImage(layer.canvas, 0, 0);
             }
         });
-        
+
         // Reset alpha
         DOM.editorCtx.globalAlpha = 1.0;
-        
+
         // Copy the composited result to all 8 preview canvases
         const imageData = DOM.editorCtx.getImageData(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
-        DOM.previewContexts.forEach(ctx => {
+        DOM.previewContexts.forEach((ctx, index) => {
             ctx.putImageData(imageData, 0, 0);
         });
+
+        console.log('Preview update completed successfully');
     },
     
     clearCanvas() {

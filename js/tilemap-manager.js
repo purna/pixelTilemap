@@ -212,12 +212,10 @@ class TilemapManager {
         // Show current state summary
         const activeCount = Array.from(this.activeTileStates.values()).filter(state => state === true).length;
         const totalClickable = this.activeTileStates.size - 1; // Exclude center tile
-        
-        if (typeof InputHandler !== 'undefined') {
-            InputHandler.showNotification(
-                `Tilemap: ${activeCount}/${totalClickable} tiles active`, 
-                'info'
-            );
+
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.info(`Tilemap: ${activeCount}/${totalClickable} tiles active`);
         }
     }
 

@@ -3,6 +3,8 @@
 
 const App = {
     initialized: false,
+    tutorialConfig: null,
+    tutorialSystem: null,
     
     async init() {
         if (this.initialized) {
@@ -41,27 +43,39 @@ const App = {
     async initializeModules() {
         // Initialize DOM first
         DOM.init();
-        
+
         // Initialize core functionality
         TilemapCore.init();
-        
+
         // Initialize managers
         PaletteManager.init();
         LayerManager.init();
+
+        // After layers are initialized, update the previews to ensure canvas loads immediately
+        if (typeof TilemapCore !== 'undefined' && TilemapCore.updatePreviews) {
+            console.log('Updating previews after layer initialization to ensure immediate canvas loading');
+            TilemapCore.updatePreviews();
+        } else {
+            console.warn('TilemapCore.updatePreviews not available');
+        }
+
         ToolManager.init();
         FileManager.init();
         SettingsManager.init();
         ZoomManager.init();
-        
+
         // Initialize UI and Input handlers
         UIManager.init();
         InputHandler.init();
-        
+
+        // Initialize tutorial system
+        this.initializeTutorialSystem();
+
         // Update initial UI state
         State.updateUI();
         ToolManager.updateActivePresetButton(State.brushSize);
         FileManager.updateHistoryButtons();
-        
+
         console.log('All modules initialized');
     },
     
@@ -152,8 +166,9 @@ const App = {
     loadAutosave() {
         const loaded = FileManager.loadAutoSave();
         if (loaded) {
-            if (typeof InputHandler !== 'undefined') {
-                InputHandler.showNotification('Auto-saved project loaded', 'info');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.info('Auto-saved project loaded');
             }
         }
     },
@@ -274,6 +289,24 @@ const App = {
         }, 500);
     },
     
+    // Tutorial system initialization
+    initializeTutorialSystem() {
+        // Initialize tutorial config
+        this.tutorialConfig = new TutorialConfig();
+
+        // Initialize tutorial system
+        this.tutorialSystem = new TutorialSystem(this);
+
+        // Initialize tutorial system after DOM is ready
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            this.tutorialSystem.init();
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.tutorialSystem.init();
+            });
+        }
+    },
+
     // Public API methods
     getState() {
         return {

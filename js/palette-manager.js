@@ -91,7 +91,10 @@ const PaletteManager = {
         State.addColorToPalette(State.currentColor);
         this.renderPalette();
         this.updateActiveSwatch(State.currentColor);
-        InputHandler.showNotification(`Color ${State.currentColor} saved to palette`, 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success(`Color ${State.currentColor} saved to palette`);
+        }
     },
     
     isValidHex(color) {
@@ -103,41 +106,56 @@ const PaletteManager = {
         State.paletteColors = colors.filter(color => this.isValidHex(color)).slice(0, Config.PALETTE_SIZE);
         this.renderPalette();
         this.updateActiveSwatch(State.currentColor);
-        InputHandler.showNotification(`Palette imported with ${State.paletteColors.length} colors`, 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success(`Palette imported with ${State.paletteColors.length} colors`);
+        }
     },
     
     // Import palette from Coolors URL
     importPaletteFromUrl(url) {
         if (!url) {
-            InputHandler.showNotification('No URL provided', 'error');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.error('No URL provided');
+            }
             return;
         }
-        
+
         // Validate Coolors URL format
         const coolorsPattern = /^https:\/\/coolors\.co\/([a-fA-F0-9-]{5,})$/;
         const match = url.match(coolorsPattern);
-        
+
         if (!match) {
-            InputHandler.showNotification('Invalid Coolors URL format', 'error');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.error('Invalid Coolors URL format');
+            }
             return;
         }
-        
+
         // Extract color codes from URL
         const colorCodes = match[1].split('-');
-        
+
         // Convert to full hex colors (add # if missing)
         const colors = colorCodes.map(code => {
             return code.startsWith('#') ? code : '#' + code;
         }).filter(color => this.isValidHex(color));
-        
+
         if (colors.length === 0) {
-            InputHandler.showNotification('No valid colors found in URL', 'error');
+            if (typeof Notifications !== 'undefined') {
+                const notifications = new Notifications();
+                notifications.error('No valid colors found in URL');
+            }
             return;
         }
-        
+
         // Import the colors
         this.importPalette(colors);
-        InputHandler.showNotification(`Imported ${colors.length} colors from Coolors`, 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success(`Imported ${colors.length} colors from Coolors`);
+        }
     },
     
     // Export current palette
@@ -159,7 +177,10 @@ const PaletteManager = {
     clearPalette() {
         State.paletteColors = [];
         this.renderPalette();
-        InputHandler.showNotification('Palette cleared', 'info');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.info('Palette cleared');
+        }
     },
     
     // Add multiple colors to palette

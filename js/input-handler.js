@@ -213,7 +213,10 @@ const InputHandler = {
             } else if (key === 'y') {
                 e.preventDefault();
                 State.redo();
-                this.showNotification('Action redone', 'info');
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.info('Action redone');
+                }
             }
         }
         
@@ -288,25 +291,25 @@ const InputHandler = {
             });
         }
 
-        // Drawing events - use main editor canvas
-        if (DOM.editorCanvas) {
-            DOM.editorCanvas.addEventListener('mousedown', (e) => this.onDrawStart(e));
-            window.addEventListener('mousemove', (e) => this.onDrawMove(e));
-            window.addEventListener('mouseup', (e) => this.onDrawEnd(e));
-            
-            DOM.editorCanvas.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                this.onDrawStart(e);
-            }, { passive: false });
-
-            window.addEventListener('touchmove', (e) => {
-                if (this.isDrawing) {
-                    e.preventDefault();
-                }
-                this.onDrawMove(e);
-            }, { passive: false });
-            window.addEventListener('touchend', (e) => this.onDrawEnd(e));
-        }
+        // Drawing events - handled by TilemapCore to avoid conflicts
+        // if (DOM.editorCanvas) {
+        //     DOM.editorCanvas.addEventListener('mousedown', (e) => this.onDrawStart(e));
+        //     window.addEventListener('mousemove', (e) => this.onDrawMove(e));
+        //     window.addEventListener('mouseup', (e) => this.onDrawEnd(e));
+        //
+        //     DOM.editorCanvas.addEventListener('touchstart', (e) => {
+        //         e.preventDefault();
+        //         this.onDrawStart(e);
+        //     }, { passive: false });
+        //
+        //     window.addEventListener('touchmove', (e) => {
+        //         if (this.isDrawing) {
+        //             e.preventDefault();
+        //         }
+        //         this.onDrawMove(e);
+        //     }, { passive: false });
+        //     window.addEventListener('touchend', (e) => this.onDrawEnd(e));
+        // }
 
         // Zoom events on the main container
         const workspace = document.querySelector('.workspace');
@@ -382,13 +385,16 @@ const InputHandler = {
 
         // Opacity slider - handled by ToolManager to avoid duplicate listeners
 
-        // Layer controls
-        if (DOM.elements.addLayerBtn && typeof LayerManager !== 'undefined') {
-            DOM.elements.addLayerBtn.addEventListener('click', () => {
-                LayerManager.addLayer();
-                this.showNotification('Layer added!', 'success');
-            });
-        }
+        // Layer controls - handled by LayerManager to avoid duplicate event listeners
+        // if (DOM.elements.addLayerBtn && typeof LayerManager !== 'undefined') {
+        //     DOM.elements.addLayerBtn.addEventListener('click', () => {
+        //         LayerManager.addLayer();
+        //         if (typeof Notifications !== 'undefined') {
+        //             const notifications = new Notifications();
+        //             notifications.success('Layer added!');
+        //         }
+        //     });
+        // }
 
         // File operations
         if (DOM.elements.saveBtn && typeof FileManager !== 'undefined') {
@@ -413,14 +419,20 @@ const InputHandler = {
         if (DOM.elements.undoBtn) {
             DOM.elements.undoBtn.addEventListener('click', () => {
                 State.undo();
-                this.showNotification('Action undone', 'info');
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.info('Action undone');
+                }
             });
         }
 
         if (DOM.elements.redoBtn) {
             DOM.elements.redoBtn.addEventListener('click', () => {
                 State.redo();
-                this.showNotification('Action redone', 'info');
+                if (typeof Notifications !== 'undefined') {
+                    const notifications = new Notifications();
+                    notifications.info('Action redone');
+                }
             });
         }
 
@@ -489,46 +501,64 @@ const InputHandler = {
     },
 
     /**
-     * Show notification to user
+     * Show notification to user using the new Notifications system
      */
     showNotification(message, type = 'info') {
-        const existing = document.querySelector('.notification');
-        if (existing) existing.remove();
-        
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        
-        notification.style.position = 'fixed';
-        notification.style.top = '20px';
-        notification.style.right = '20px';
-        notification.style.padding = '12px 20px';
-        notification.style.borderRadius = '4px';
-        notification.style.color = '#fff';
-        notification.style.fontSize = '12px';
-        notification.style.fontWeight = 'bold';
-        notification.style.zIndex = '10000';
-        notification.style.border = '1px solid rgba(255,255,255,0.2)';
-        notification.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
-        notification.style.transition = 'all 0.3s ease';
-        notification.style.transform = 'translateY(-20px)';
-        notification.style.opacity = '0';
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            switch (type) {
+                case 'success':
+                    notifications.success(message);
+                    break;
+                case 'error':
+                    notifications.error(message);
+                    break;
+                case 'warning':
+                    notifications.showNotification(message, 'warning');
+                    break;
+                default:
+                    notifications.info(message);
+            }
+        } else {
+            // Fallback to old system if Notifications is not available
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
 
-        const colors = { success: '#00ff41', error: '#ff006e', info: '#00d9ff' };
-        notification.style.backgroundColor = '#1a1a2e';
-        notification.style.borderLeft = `4px solid ${colors[type] || colors.info}`;
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
 
-        document.body.appendChild(notification);
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '12px 20px';
+            notification.style.borderRadius = '4px';
+            notification.style.color = '#fff';
+            notification.style.fontSize = '12px';
+            notification.style.fontWeight = 'bold';
+            notification.style.zIndex = '10000';
+            notification.style.border = '1px solid rgba(255,255,255,0.2)';
+            notification.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
+            notification.style.transition = 'all 0.3s ease';
+            notification.style.transform = 'translateY(-20px)';
+            notification.style.opacity = '0';
 
-        requestAnimationFrame(() => {
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateY(0)';
-        });
+            const colors = { success: '#00ff41', error: '#ff006e', info: '#00d9ff' };
+            notification.style.backgroundColor = '#1a1a2e';
+            notification.style.borderLeft = `4px solid ${colors[type] || colors.info}`;
 
-        // Auto remove after 3 seconds
-        setTimeout(() => {
-            this.hideNotification();
-        }, 3000);
+            document.body.appendChild(notification);
+
+            requestAnimationFrame(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            });
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                this.hideNotification();
+            }, 3000);
+        }
     },
 
     /**

@@ -7,7 +7,8 @@
     <title>Seamless Tilemap Editor Pro</title>
     <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/tilemap-styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/tutorials.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap');
     </style>
@@ -307,109 +308,227 @@
         <i class="fas fa-chevron-right"></i>
     </div>
 
-    <!-- SETTINGS MODAL -->
-    <div class="modal-overlay" id="settings-modal">
+    <!-- UNIFIED SETTINGS MODAL -->
+    <div class="modal-overlay" id="unified-settings-modal">
         <div class="modal">
-            <button class="modal-close-btn" id="btn-settings-x" title="Close">
-                <i class="fas fa-times"></i>
-            </button>
+            <header>
             <div class="modal-title">
                 <i class="fas fa-cog"></i> Settings
             </div>
             <div style="font-size:0.8rem; color:#94a3b8; margin-bottom:15px;">
                 Configure your Tilemap Studio preferences
             </div>
-            <div class="settings-content">
-                <div class="property-group">
-                    <label class="property-label">
-                        <input type="checkbox" id="setting-grid" checked>
-                        Show Grid
-                    </label>
-                </div>
-                <div class="property-group">
-                    <label class="property-label">
-                        <input type="checkbox" id="setting-border" checked>
-                        Show Border
-                    </label>
-                </div>
-            
-                <div class="property-group">
-                    <label class="property-label">
-                        <input type="checkbox" id="setting-tooltips" checked>
-                        Show Tooltips
-                    </label>
-                </div>
-                <div class="property-group">
-                    <label class="property-label">
-                        <input type="checkbox" id="setting-helpers" checked>
-                        Show Helpers
-                    </label>
-                </div>
 
-                <div class="property-group">
-                    <label class="property-label">
-                        Default Background
+            <!-- Settings Tabs -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="general" id="tab-general">
+                    <i class="fas fa-sliders-h"></i> General
+                </button>
+                <button class="settings-tab" data-tab="scene" id="tab-scene">
+                    <i class="fas fa-image"></i> Tilemaps
+                </button>
+                <button class="settings-tab" data-tab="export" id="tab-export">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button class="settings-tab" data-tab="tutorial" id="tab-tutorial">
+                    <i class="fas fa-graduation-cap"></i> Tutorial
+                </button>
+            </div>
+            </header>
+            <!-- Scrollable Content Wrapper -->
+            <div class="modal-content-wrapper">
+            <!-- General Settings Tab -->
+            <div class="settings-tab-content active" data-tab-content="general">
+                <div class="settings-content">
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="setting-border" checked>
+                            Show Border
+                        </label>
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="setting-tooltips" checked>
+                            Show Tooltips
+                        </label>
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="setting-helpers" checked>
+                            Show Helpers
+                        </label>
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="setting-darkmode" checked>
+                        Dark Mode
+                        </label>
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">
+                        <input type="checkbox" id="setting-autosave" checked>
+                         Auto Save
                     </label>
-                    <div class="bg-control-container">
-                        <!-- Background mode toggle -->
-                        <div class="bg-mode-toggle" role="tablist" aria-label="Background mode">
-                            <button class="bg-mode-btn active" data-mode="color" role="tab" aria-selected="true">
-                                <i class="fas fa-palette"></i>
-                                <span>Color</span>
-                            </button>
-                            <button class="bg-mode-btn" data-mode="transparent" role="tab" aria-selected="false">
-                                <i class="fas fa-eye-slash"></i>
-                                <span>Transparent</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Color picker section -->
-                        <div class="bg-color-section" id="bg-color-section">
-                            <div class="color-picker-group">
-                                <input type="color" id="setting-bg-color" value="#ffffff" 
-                                       class="bg-color-input" aria-label="Background color">
-                                <div class="color-preview" id="color-preview">
-                                    <div class="preview-box" id="preview-box"></div>
-                                    <span class="color-value" id="color-value">#ffffff</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scene Settings Tab -->
+            <div class="settings-tab-content" data-tab-content="scene">
+                <div class="scene-settings-content">
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="setting-grid" checked>
+                            Show Grid
+                        </label>
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">
+                            Default Background
+                        </label>
+                        <div class="bg-control-container">
+                            <!-- Background mode toggle -->
+                            <div class="bg-mode-toggle" role="tablist" aria-label="Background mode">
+                                <button class="bg-mode-btn active" data-mode="color" role="tab" aria-selected="true">
+                                    <i class="fas fa-palette"></i>
+                                    <span>Color</span>
+                                </button>
+                                <button class="bg-mode-btn" data-mode="transparent" role="tab" aria-selected="false">
+                                    <i class="fas fa-eye-slash"></i>
+                                    <span>Transparent</span>
+                                </button>
+                            </div>
+
+                            <!-- Color picker section -->
+                            <div class="bg-color-section" id="bg-color-section">
+                                <div class="color-picker-group">
+                                    <input type="color" id="setting-bg-color" value="#ffffff"
+                                           class="bg-color-input" aria-label="Background color">
+                                    <div class="color-preview" id="color-preview">
+                                        <div class="preview-box" id="preview-box"></div>
+                                        <span class="color-value" id="color-value">#ffffff</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Transparent preview section -->
+                            <div class="bg-transparent-section hidden" id="bg-transparent-section">
+                                <div class="transparent-preview">
+                                    <div class="transparent-grid"></div>
+                                    <span class="transparent-label">Background will be transparent</span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Transparent preview section -->
-                        <div class="bg-transparent-section hidden" id="bg-transparent-section">
-                            <div class="transparent-preview">
-                                <div class="transparent-grid"></div>
-                                <span class="transparent-label">Background will be transparent</span>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">
+                            Background Color:
+                            <input type="color" id="setting-background-color" value="#1a1a2e">
+                        </label>
                     </div>
                 </div>
+            </div>
 
-                 <div class="property-group">
-                    <label class="property-label">
-                        <input type="checkbox" id="setting-darkmode" checked>
-                    Dark Mode
-                    </label>
+            <!-- Export Settings Tab -->
+            <div class="settings-tab-content" data-tab-content="export">
+                <div class="export-settings-content">
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="setting-export-transparent" checked>
+                            Export with Transparent Background
+                        </label>
+                    </div>
+                    <div class="property-group">
+                        <label class="property-label">
+                            Export Resolution:
+                            <select id="setting-export-resolution" style="background: var(--bg-light); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 10px; font-size: 0.8rem; color: var(--text-primary); width: 100%; margin-top: 6px;">
+                                <!-- Game Asset Sizes -->
+                                <option value="24x24">24×24 - Game Icon</option>
+                                <option value="36x36">36×36 - Game Icon</option>
+                                <option value="48x48">48×48 - Game Icon</option>
+                                <option value="128x128">128×128 - Game Sprite</option>
+                                <option value="512x512">512×512 - Game Texture</option>
+                                <option value="1024x1024">1024×1024 - High-res Texture</option>
+
+                                <!-- Standard Resolutions -->
+                                <option value="1920x1080">1920×1080 - Full HD</option>
+                                <option value="2560x1440">2560×1440 - 2K</option>
+                                <option value="3840x2160">3840×2160 - 4K</option>
+                                <option value="custom">Custom Size</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="property-group" id="custom-resolution-group" style="display: none;">
+                        <label class="property-label">
+                            Custom Width:
+                            <input type="number" id="setting-custom-width" value="1920" min="100" max="8000">
+                        </label>
+                        <label class="property-label">
+                            Custom Height:
+                            <input type="number" id="setting-custom-height" value="1080" min="100" max="8000">
+                        </label>
+                    </div>
+                    <div class="property-group" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                        <button id="exportSettingsBtn" class="btn" style="margin-bottom: 8px; width: 100%;">
+                            <i class="fas fa-cloud-download-alt"></i> Export Defaults
+                        </button>
+                        <button id="saveToBrowserBtn" class="btn" style="margin-bottom: 8px; width: 100%;">
+                            <i class="fas fa-save"></i> Save to Browser
+                        </button>
+                        <button id="loadFromBrowserBtn" class="btn secondary" style="width: 100%;">
+                            <i class="fas fa-download"></i> Load from Browser
+                        </button>
+                    </div>
                 </div>
-         
-            <div class="property-group">
-                    <label class="property-label">
-                    <input type="checkbox" id="setting-autosave" checked>
-                     Auto Save
-                </label>
             </div>
 
-                
-                 
-           
-               
+            <!-- Tutorial Settings Tab -->
+            <div class="settings-tab-content" data-tab-content="tutorial">
+                <div class="settings-content">
+                    <div class="property-group">
+                        <label class="property-label">
+                            Tutorial Settings
+                        </label>
+                    </div>
+
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="enableTutorialsSettings" checked>
+                            Enable Tutorials
+                        </label>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; margin-left: 30px;">
+                            Show interactive tutorials on startup
+                        </div>
+                    </div>
+
+                    <div class="property-group">
+                        <label class="property-label">
+                            <input type="checkbox" id="showTutorialHints" checked>
+                            Show Tutorial Hints
+                        </label>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; margin-left: 30px;">
+                            Display helpful hints and tooltips
+                        </div>
+                    </div>
+
+                    <div class="property-group" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                        <button id="startTutorialBtn" class="btn" style="margin-bottom: 8px; width: 100%;">
+                            <i class="fas fa-graduation-cap"></i> Start Tutorial
+                        </button>
+                        <button id="resetTutorialBtn" class="btn secondary" style="width: 100%;">
+                            <i class="fas fa-redo"></i> Reset Tutorial Progress
+                        </button>
+                    </div>
+                </div>
             </div>
+            </div>
+            <footer>
             <div class="modal-actions">
-                <button class="btn" id="btn-settings-close">Cancel</button>
                 <button class="btn" id="btn-settings-reset">Reset</button>
-
+                <button class="btn" id="btn-settings-close">Close</button>
                 <button class="btn primary" id="btn-settings-save">Save Settings</button>
             </div>
+            </footer>
         </div>
     </div>
 
@@ -423,6 +542,7 @@
     <script src="js/config.js"></script>
     <script src="js/state.js"></script>
     <script src="js/dom.js"></script>
+    <script src="js/notifications.js"></script>
 
     <!-- UI Components -->
     <script src="js/tooltip.js"></script>
@@ -436,6 +556,8 @@
     <script src="js/tilemap-manager.js"></script>
     <script src="js/settings-manager.js"></script>
     <script src="js/zoom-manager.js"></script>
+    <script src="js/tutorialConfig.js"></script>
+    <script src="js/tutorialSystem.js"></script>
 
     <!-- Input handling -->
     <script src="js/input-handler.js"></script>

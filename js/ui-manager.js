@@ -7,13 +7,14 @@ const UIManager = {
         this.setupPanelToggle();
         this.setupContextSwitching();
         this.setupBrushControlsDrag();
-        
+        this.setupSettingsTabs();
+
         // Load saved panel state
         this.loadPanelState();
-        
+
         // Set initial panel state for default tool (pencil)
         this.updatePanelForTool('pencil');
-        
+
         console.log('UI Manager initialized successfully');
     },
 
@@ -459,8 +460,9 @@ const UIManager = {
         // Update UI checkboxes
         this.updateSettingsUI(defaultSettings);
         
-        if (typeof InputHandler !== 'undefined') {
-            InputHandler.showNotification('Settings reset to defaults', 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success('Settings reset to defaults');
         }
     },
 
@@ -480,8 +482,9 @@ const UIManager = {
         
         URL.revokeObjectURL(url);
         
-        if (typeof InputHandler !== 'undefined') {
-            InputHandler.showNotification('Settings exported successfully', 'success');
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            notifications.success('Settings exported successfully');
         }
     },
 
@@ -542,14 +545,75 @@ const UIManager = {
         }
     },
 
+    /**
+     * Setup tab functionality for settings modal
+     */
+    setupSettingsTabs() {
+        console.log('Setting up settings tabs...');
+
+        // Check if settings modal exists
+        const settingsModal = document.getElementById('unified-settings-modal');
+        console.log('Settings modal found:', !!settingsModal);
+        if (!settingsModal) return;
+
+        // Get all tab buttons
+        const tabButtons = settingsModal.querySelectorAll('.settings-tab');
+        console.log('Tab buttons found:', tabButtons.length);
+        if (!tabButtons || tabButtons.length === 0) return;
+
+        // Get all tab content sections
+        const tabContents = settingsModal.querySelectorAll('.settings-tab-content');
+        console.log('Tab contents found:', tabContents.length);
+
+        // Add click event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                console.log('Tab clicked:', button.getAttribute('data-tab'));
+                const tabId = button.getAttribute('data-tab');
+
+                // Remove active class from all tabs and content
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked tab and corresponding content
+                button.classList.add('active');
+                const correspondingContent = settingsModal.querySelector(`.settings-tab-content[data-tab-content="${tabId}"]`);
+                console.log('Corresponding content found:', !!correspondingContent);
+                if (correspondingContent) {
+                    correspondingContent.classList.add('active');
+                }
+            });
+        });
+
+        // Set initial active tab (first tab by default)
+        if (tabButtons.length > 0 && tabContents.length > 0) {
+            tabButtons[0].classList.add('active');
+            tabContents[0].classList.add('active');
+            console.log('Set initial active tab');
+        }
+    },
+
 
 
     /**
-     * Show notification (delegate to InputHandler if available)
+     * Show notification (delegate to Notifications if available)
      */
     showNotification(message, type = 'info') {
-        if (typeof InputHandler !== 'undefined' && InputHandler.showNotification) {
-            InputHandler.showNotification(message, type);
+        if (typeof Notifications !== 'undefined') {
+            const notifications = new Notifications();
+            switch (type) {
+                case 'success':
+                    notifications.success(message);
+                    break;
+                case 'error':
+                    notifications.error(message);
+                    break;
+                case 'warning':
+                    notifications.showNotification(message, 'warning');
+                    break;
+                default:
+                    notifications.info(message);
+            }
         } else {
             console.log(`${type.toUpperCase()}: ${message}`);
         }
