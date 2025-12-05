@@ -6,58 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seamless Tilemap Editor Pro</title>
     <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css"></noscript>
+    <!-- Local Font Awesome Implementation -->
+    <link rel="stylesheet" href="fonts/fontawesome-free-6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/tutorials.css">
+     <!-- Custom Font -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap');
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/inter-normal.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
     </style>
-    <script>
-        // Font Awesome fallback
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if Font Awesome is loaded
-            if (typeof FontAwesome === 'undefined' || !document.querySelector('.fa')) {
-                console.warn('Font Awesome not loaded, applying fallback styles');
-
-                // Add basic fallback styles for critical icons
-                const style = document.createElement('style');
-                style.textContent = `
-                    .fa, .fas, .far, .fal, .fat, .fad {
-                        font-family: Arial, sans-serif;
-                        font-weight: normal;
-                        font-style: normal;
-                    }
-                    .fa-undo:before { content: "↩"; }
-                    .fa-redo:before { content: "↪"; }
-                    .fa-minus:before { content: "-"; }
-                    .fa-plus:before { content: "+"; }
-                    .fa-save:before { content: "💾"; }
-                    .fa-folder-open:before { content: "📁"; }
-                    .fa-file-export:before { content: "📤"; }
-                    .fa-pencil-alt:before { content: "✏️"; }
-                    .fa-paint-brush:before { content: "🖌️"; }
-                    .fa-eraser:before { content: "🧽"; }
-                    .fa-eye-dropper:before { content: "🖱️"; }
-                    .fa-layer-group:before { content: "📄"; }
-                    .fa-cog:before { content: "⚙️"; }
-                    .fa-th:before { content: "🔳"; }
-                    .fa-chevron-right:before { content: "→"; }
-                    .fa-link:before { content: "🔗"; }
-                    .fa-plus-circle:before { content: "➕"; }
-                    .fa-sliders-h:before { content: "📊"; }
-                    .fa-image:before { content: "🖼️"; }
-                    .fa-download:before { content: "⬇"; }
-                    .fa-graduation-cap:before { content: "🎓"; }
-                    .fa-expand-arrows-alt:before { content: "⤡"; }
-                    .fa-cloud-download-alt:before { content: "☁⬇"; }
-                    .fa-eye-slash:before { content: "👁️‍🗲"; }
-                    .fa-palette:before { content: "🎨"; }
-                `;
-                document.head.appendChild(style);
-            }
-        });
-    </script>
 </head>
 
 <body>
