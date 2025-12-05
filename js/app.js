@@ -30,7 +30,6 @@ const App = {
             this.initialized = true;
             
             console.log('Seamless Tilemap Editor Pro initialized successfully');
-            this.showWelcomeMessage();
             
         } catch (error) {
             console.error('Failed to initialize application:', error);
@@ -173,121 +172,6 @@ const App = {
         }
     },
     
-    showWelcomeMessage() {
-        // Check if helpers should be shown
-        if (typeof SettingsManager !== 'undefined' && SettingsManager.settings && SettingsManager.settings.showHelpers === false) {
-            return; // Don't show welcome message if helpers are disabled
-        }
-
-        setTimeout(() => {
-            const welcomeMessage = `
-                <strong>Welcome to Seamless Tilemap Editor Pro!</strong><br><br>
-                <strong>Quick Start:</strong><br>
-                • Click and drag across the 9 tiles to draw seamlessly<br>
-                • Use toolbar to switch between Brush (B), Eraser (E), and Color Picker (I)<br>
-                • Adjust brush size with the slider<br>
-                • Save/Load projects with Ctrl+S / Ctrl+O<br><br>
-                <strong>Drawing wraps around edges for seamless tiles!</strong>
-            `;
-            
-            // Create welcome notification
-            const notification = document.createElement('div');
-            notification.className = 'welcome-notification';
-            notification.innerHTML = welcomeMessage;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                max-width: 400px;
-                background: var(--bg-dark);
-                border: 1px solid var(--accent-primary);
-                border-radius: 8px;
-                padding: 16px;
-                color: var(--text-primary);
-                font-size: 13px;
-                line-height: 1.4;
-                z-index: 10000;
-                box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-                animation: slideIn 0.3s ease-out;
-            `;
-            
-            // Add close button
-            const closeBtn = document.createElement('button');
-            closeBtn.innerHTML = '×';
-            closeBtn.style.cssText = `
-                position: absolute;
-                top: 8px;
-                right: 8px;
-                background: none;
-                border: none;
-                color: var(--text-secondary);
-                font-size: 18px;
-                cursor: pointer;
-                width: 24px;
-                height: 24px;
-                border-radius: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            
-            closeBtn.addEventListener('click', () => {
-                notification.remove();
-            });
-            
-            closeBtn.addEventListener('mouseenter', () => {
-                closeBtn.style.background = 'var(--bg-light)';
-                closeBtn.style.color = 'var(--text-primary)';
-            });
-            
-            closeBtn.addEventListener('mouseleave', () => {
-                closeBtn.style.background = 'none';
-                closeBtn.style.color = 'var(--text-secondary)';
-            });
-            
-            notification.appendChild(closeBtn);
-            document.body.appendChild(notification);
-            
-            // Auto-hide after 10 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'slideOut 0.3s ease-in';
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }
-            }, 10000);
-            
-            // Add CSS animations
-            if (!document.getElementById('welcome-animations')) {
-                const style = document.createElement('style');
-                style.id = 'welcome-animations';
-                style.textContent = `
-                    @keyframes slideIn {
-                        from {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                        to {
-                            transform: translateX(0);
-                            opacity: 1;
-                        }
-                    }
-                    @keyframes slideOut {
-                        from {
-                            transform: translateX(0);
-                            opacity: 1;
-                        }
-                        to {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }, 500);
-    },
     
     // Tutorial system initialization
     initializeTutorialSystem() {
