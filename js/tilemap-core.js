@@ -53,7 +53,7 @@ const TilemapCore = {
         });
     },
     
-handleDrawing(e) {
+ handleDrawing(e) {
         const targetCanvas = e.target;
         
         // Check if we have a valid canvas with grid position
@@ -61,8 +61,12 @@ handleDrawing(e) {
             return;
         }
         
-        // Determine the brush type based on mouse button or event type
-        if (e.type === 'contextmenu') {
+        // Determine the brush type based on tool, mouse button, or event type
+        if (State.currentTool === 'eraser') {
+            // Eraser tool always uses erase color regardless of mouse button
+            State.setBrush(Config.ERASE_COLOR);
+            State.setDrawing(true);
+        } else if (e.type === 'contextmenu') {
             e.preventDefault();
             State.setBrush(Config.ERASE_COLOR);
             State.setDrawing(true);

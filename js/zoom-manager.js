@@ -130,11 +130,9 @@ const ZoomManager = {
             tileGridContainer.style.transform = `scale(${State.zoom})`;
             tileGridContainer.style.transformOrigin = 'center center';
             
-            // Ensure the container can accommodate the scaled content
-            const scaledWidth = 3 * Config.CANVAS_SIZE * State.zoom;
-            const scaledHeight = 3 * Config.CANVAS_SIZE * State.zoom;
-            tileGridContainer.style.width = `${scaledWidth}px`;
-            tileGridContainer.style.height = `${scaledHeight}px`;
+            // Note: We don't set width/height here because the CSS transform
+            // scale() handles the visual scaling. Setting width/height would
+            // cause double-scaling (scale transform + layout size change).
         }
     },
 
