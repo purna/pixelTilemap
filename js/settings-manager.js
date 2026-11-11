@@ -160,6 +160,22 @@ const SettingsManager = {
 
         if (widthInput) widthInput.value = canvasWidth;
         if (heightInput) heightInput.value = canvasHeight;
+
+        const defaultWidth = document.getElementById('setting-default-canvas-width');
+        const defaultHeight = document.getElementById('setting-default-canvas-height');
+        if (defaultWidth) defaultWidth.value = canvasWidth;
+        if (defaultHeight) defaultHeight.value = canvasHeight;
+    },
+
+    openTab(tabId) {
+        const modal = document.getElementById('unified-settings-modal');
+        if (!modal) return;
+        modal.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabId);
+        });
+        modal.querySelectorAll('.settings-tab-content').forEach(panel => {
+            panel.classList.toggle('active', panel.dataset.tabContent === tabId);
+        });
     },
 
     closeSettings() {
@@ -306,11 +322,43 @@ const SettingsManager = {
             });
         }
 
-        // Canvas resize apply button
-        const applyResizeBtn = document.getElementById('apply-canvas-resize');
-        if (applyResizeBtn) {
-            applyResizeBtn.addEventListener('click', () => {
-                this.applyCanvasResize();
+        // Default canvas size apply button
+        const applyDefaultCanvasBtn = document.getElementById('apply-default-canvas-size');
+        if (applyDefaultCanvasBtn) {
+            applyDefaultCanvasBtn.addEventListener('click', () => {
+                const width = parseInt(document.getElementById('setting-default-canvas-width')?.value, 10);
+                const height = parseInt(document.getElementById('setting-default-canvas-height')?.value, 10);
+                if (this.resizeCanvas(width, height)) {
+                    if (typeof Notifications !== 'undefined') {
+                        new Notifications().success(`Canvas resized to ${width}×${height}`);
+                    }
+                }
+            });
+        }
+
+        // Default canvas size inputs stay square, matching the tile editor.
+        const defaultWidthInput = document.getElementById('setting-default-canvas-width');
+        const defaultHeightInput = document.getElementById('setting-default-canvas-height');
+        if (defaultWidthInput && defaultHeightInput) {
+            defaultWidthInput.addEventListener('input', () => {
+                defaultHeightInput.value = defaultWidthInput.value;
+            });
+        }
+
+        // Right-panel canvas resize button
+        const panelResizeBtn = document.getElementById('apply-canvas-resize');
+        const panelWidth = document.getElementById('widthInput');
+        const panelHeight = document.getElementById('heightInput');
+        if (panelResizeBtn && panelWidth && panelHeight && !panelResizeBtn.dataset.settingsBound) {
+            panelResizeBtn.dataset.settingsBound = 'true';
+            panelResizeBtn.addEventListener('click', () => {
+                const width = parseInt(panelWidth.value, 10);
+                const height = parseInt(panelHeight.value, 10);
+                if (this.resizeCanvas(width, height)) {
+                    if (typeof Notifications !== 'undefined') {
+                        new Notifications().success(`Canvas resized to ${width}×${height}`);
+                    }
+                }
             });
         }
 
@@ -375,9 +423,10 @@ const SettingsManager = {
         if (saveToBrowserBtn) {
             saveToBrowserBtn.addEventListener('click', () => {
                 this.saveSettingsToStorage();
-                if (typeof Notifications !== 'undefined') {
-                    const notifications = new Notifications();
-                    notifications.success('Settings saved to browser storage');
+                if (typeof FileManager !== 'undefined') {
+                    FileManager.saveToBrowser();
+                } else if (typeof Notifications !== 'undefined') {
+                    new Notifications().success('Settings saved to browser storage');
                 }
             });
         }
@@ -385,11 +434,12 @@ const SettingsManager = {
         // Load from Browser button
         const loadFromBrowserBtn = document.getElementById('loadFromBrowserBtn');
         if (loadFromBrowserBtn) {
-            loadFromBrowserBtn.addEventListener('click', () => {
+            loadFromBrowserBtn.addEventListener('click', async () => {
                 this.loadSettings();
-                if (typeof Notifications !== 'undefined') {
-                    const notifications = new Notifications();
-                    notifications.success('Settings loaded from browser storage');
+                if (typeof FileManager !== 'undefined' && typeof FileManager.loadFromBrowser === 'function') {
+                    await FileManager.loadFromBrowser();
+                } else if (typeof Notifications !== 'undefined') {
+                    new Notifications().success('Settings loaded from browser storage');
                 }
             });
         }
@@ -429,8 +479,17 @@ const SettingsManager = {
             this.settings.backgroundColor = bgColorPicker.value;
         }
 
-        // Save canvas size from inputs (use current input values)
-        if (widthInput && heightInput) {
+        // Save canvas size from inputs
+        const defaultWidthInput = document.getElementById('setting-default-canvas-width');
+        const defaultHeightInput = document.getElementById('setting-default-canvas-height');
+        if (defaultWidthInput && defaultHeightInput) {
+            const widthValue = Math.max(4, Math.min(512, parseInt(defaultWidthInput.value, 10) || Config.TILE_DIM));
+            const heightValue = widthValue;
+            this.settings.canvasSize = { width: widthValue, height: heightValue };
+            if (widthValue !== Config.TILE_DIM) {
+                this.resizeCanvas(widthValue, heightValue, { persist: false });
+            }
+        } else if (widthInput && heightInput) {
             const widthValue = parseInt(widthInput.value) || Config.TILE_DIM;
             this.settings.canvasSize = {
                 width: widthValue,
@@ -471,40 +530,66 @@ const SettingsManager = {
             return;
         }
 
-        // Update settings
-        this.settings.canvasSize = { width: newWidth, height: newHeight };
-
         // Apply the resize to the actual canvas
         this.resizeCanvas(newWidth, newHeight);
-
-        // Save to storage
-        this.saveSettingsToStorage();
-
-        if (typeof Notifications !== 'undefined') {
-            const notifications = new Notifications();
-            notifications.success(`Canvas resized to ${newWidth}×${newHeight}`);
-        }
     },
 
-    resizeCanvas(width, height) {
-        // Update config values
-        Config.TILE_DIM = width;
-        Config.CANVAS_SIZE = width * Config.PIXEL_SIZE;
-        
-        // Resize all canvas elements
-        if (DOM && DOM.allCanvases) {
-            DOM.allCanvases.forEach(canvas => {
-                canvas.width = Config.CANVAS_SIZE;
-                canvas.height = Config.CANVAS_SIZE;
+    resizeCanvas(width, height, options = {}) {
+        const { persist = true, silent = false } = options;
+        width = parseInt(width, 10);
+        height = parseInt(height, 10) || width;
+
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width < 4 || height < 4 || width > 512 || height > 512) {
+            if (!silent && typeof Notifications !== 'undefined') {
+                new Notifications().error('Canvas size must be between 4 and 512 pixels');
+            }
+            return false;
+        }
+
+        const oldCanvasSize = Config.CANVAS_SIZE;
+        const newCanvasSize = width * Config.PIXEL_SIZE;
+
+        // Resize every layer, preserving its artwork.
+        if (typeof State !== 'undefined' && Array.isArray(State.layers)) {
+            State.layers.forEach(layer => {
+                if (!layer.canvas || layer.canvas.width === newCanvasSize) return;
+                const scaled = document.createElement('canvas');
+                scaled.width = layer.canvas.width;
+                scaled.height = layer.canvas.height;
+                scaled.getContext('2d').drawImage(layer.canvas, 0, 0);
+
+                layer.canvas.width = newCanvasSize;
+                layer.canvas.height = newCanvasSize;
+                const ctx = layer.canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false;
+                ctx.clearRect(0, 0, newCanvasSize, newCanvasSize);
+                ctx.drawImage(scaled, 0, 0, oldCanvasSize, oldCanvasSize, 0, 0, newCanvasSize, newCanvasSize);
             });
         }
-        
-        // Redraw the canvases
-        if (typeof TilemapCore !== 'undefined') {
-            TilemapCore.updatePreviews();
+
+        // Update config values
+        Config.TILE_DIM = width;
+        Config.CANVAS_SIZE = newCanvasSize;
+
+        // Keep the visual canvas grid in sync with the logical resolution.
+        document.documentElement.style.setProperty('--canvas-size', `${newCanvasSize}px`);
+
+        // Resize all canvas elements
+        if (typeof DOM !== 'undefined' && DOM.allCanvases) {
+            DOM.allCanvases.forEach(canvas => {
+                canvas.width = newCanvasSize;
+                canvas.height = newCanvasSize;
+            });
         }
-        
-        console.log(`Canvas resized to ${width}×${height} (${Config.CANVAS_SIZE}px)`);
+
+        this.settings.canvasSize = { width, height };
+
+        if (persist) this.saveSettingsToStorage();
+        if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+        if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
+
+        console.log(`Canvas resized to ${width}×${height} (${newCanvasSize}px)`);
+        return true;
     },
 
     resetSettings() {
@@ -605,11 +690,12 @@ const SettingsManager = {
                 const loadedSettings = JSON.parse(saved);
                 this.settings = { ...this.settings, ...loadedSettings };
                 
-                // Apply loaded canvas size to config
+                // Apply loaded canvas size to config and to the live canvases
                 if (loadedSettings.canvasSize) {
-                    Config.TILE_DIM = loadedSettings.canvasSize.width || Config.TILE_DIM;
-                    Config.CANVAS_SIZE = Config.TILE_DIM * Config.PIXEL_SIZE;
-                    console.log(`Loaded canvas size: ${Config.TILE_DIM}×${Config.TILE_DIM}`);
+                    const width = Math.max(4, Math.min(512, parseInt(loadedSettings.canvasSize.width, 10) || Config.TILE_DIM));
+                    const height = Math.max(4, Math.min(512, parseInt(loadedSettings.canvasSize.height, 10) || width));
+                    this.resizeCanvas(width, height, { persist: false, silent: true });
+                    console.log(`Loaded canvas size: ${width}×${height}`);
                 }
             }
         } catch (error) {

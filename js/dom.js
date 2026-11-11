@@ -140,6 +140,15 @@ const DOM = {
                 </div>
             </div>
             <div class="layer-controls">
+                <button class="rename-btn" title="Rename Layer">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="move-up-btn" title="Move Layer Up">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+                <button class="move-down-btn" title="Move Layer Down">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
                 <button class="visibility-btn" title="Toggle Visibility">
                     <i class="fas ${layer.visible ? 'fa-eye' : 'fa-eye-slash'}"></i>
                 </button>

@@ -180,15 +180,10 @@ const ToolManager = {
     setTool(tool) {
         State.currentTool = tool;
 
-        // Logic for tool-specific color/mode
-        if (tool === 'eraser') {
-            // Eraser should use ERASE_COLOR
-            // Config.ERASE_COLOR is defined as '#ffffff'.
-            State.setColor(Config.ERASE_COLOR);
-        } else if (tool === 'pencil' || tool === 'brush') {
-            // Standard tools revert to the user-selected color
-            State.setColor(State.currentColor);
-        }
+        // Erasing is handled by the drawing code; keep the user's selected
+        // colour intact so it is still there when they switch back to pencil.
+        // (Setting State.currentColor to "transparent" previously broke the
+        // colour picker after using the eraser.)
 
         // Update active class on buttons
         DOM.elements.toolButtons.forEach(button => {

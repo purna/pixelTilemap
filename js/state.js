@@ -19,6 +19,7 @@ const State = {
     
     // UI state
     showLayers: false,
+    recentColors: ['#282828', '#ffffff', '#ff0000', '#00ff00'],
     paletteColors: [
         '#282828', '#ffffff', '#ff0000', '#00ff00', 
         '#0000ff', '#ffff00', '#ff00ff', '#00ffff',
@@ -52,9 +53,35 @@ const State = {
         } else {
             // Assume it's already in hex format
             this.currentColor = color.startsWith('#') ? color : '#' + color;
-            this.currentBrush = this.hexToRgb(this.currentColor);
+            this.currentBrush = color === 'transparent' ? 'transparent' : this.hexToRgb(this.currentColor);
         }
+        this.recordRecentColor(this.currentColor);
         this.updateUI();
+    },
+
+    recordRecentColor(color) {
+        if (!/^#[A-Fa-f0-9]{6}$/.test(color)) return;
+        const normalized = color.toLowerCase();
+        this.recentColors = [normalized, ...this.recentColors.filter(item => item.toLowerCase() !== normalized)].slice(0, 4);
+        try {
+            localStorage.setItem('tilemap-recent-colors', JSON.stringify(this.recentColors));
+        } catch (error) {
+            // Storage may be unavailable; the palette still works for this session.
+        }
+        if (typeof PaletteManager !== 'undefined' && typeof PaletteManager.renderRecentColors === 'function') {
+            PaletteManager.renderRecentColors();
+        }
+    },
+
+    loadRecentColors() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('tilemap-recent-colors') || '[]');
+            if (Array.isArray(saved) && saved.length) {
+                this.recentColors = saved.filter(color => /^#[A-Fa-f0-9]{6}$/.test(color)).slice(0, 4);
+            }
+        } catch (error) {
+            // Ignore malformed recent colour history.
+        }
     },
     
     setBrushSize(size) {

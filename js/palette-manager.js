@@ -3,7 +3,9 @@
 
 const PaletteManager = {
     init() {
+        State.loadRecentColors();
         this.renderPalette();
+        this.renderRecentColors();
         this.setupEventListeners();
         console.log('Palette Manager initialized');
     },
@@ -53,6 +55,35 @@ const PaletteManager = {
                 this.setCurrentColor(color);
             }
         });
+
+        // Floating recent-colour palette
+        const recentContainer = document.getElementById('recent-colors-swatches');
+        if (recentContainer) {
+            recentContainer.addEventListener('click', (event) => {
+                const swatch = event.target.closest('.recent-swatch');
+                if (!swatch) return;
+                this.setCurrentColor(swatch.dataset.color);
+            });
+        }
+    },
+
+    renderRecentColors() {
+        const container = document.getElementById('recent-colors-swatches');
+        if (!container) return;
+        container.innerHTML = '';
+        State.recentColors.slice(0, 4).forEach(color => {
+            const swatch = document.createElement('button');
+            swatch.type = 'button';
+            swatch.className = 'recent-swatch';
+            swatch.dataset.color = color;
+            swatch.title = color;
+            swatch.setAttribute('aria-label', `Use recent colour ${color}`);
+            swatch.style.backgroundColor = color;
+            if (color.toLowerCase() === String(State.currentColor).toLowerCase()) {
+                swatch.classList.add('active');
+            }
+            container.appendChild(swatch);
+        });
     },
     
     setCurrentColor(color) {
@@ -61,6 +92,7 @@ const PaletteManager = {
             DOM.elements.colorPicker.value = color;
             DOM.elements.colorHex.value = color;
             this.updateActiveSwatch(color);
+            this.renderRecentColors();
         }
     },
     

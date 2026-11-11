@@ -94,6 +94,28 @@ const TilemapCore = {
         const scale = State.zoom;
         x = x / scale;
         y = y / scale;
+
+        // Colour picker: sample the clicked canvas instead of painting.
+        if (State.currentTool === 'eyedropper') {
+            const pickX = Math.max(0, Math.min(targetCanvas.width - 1, Math.floor(x)));
+            const pickY = Math.max(0, Math.min(targetCanvas.height - 1, Math.floor(y)));
+            try {
+                const pixel = targetCanvas.getContext('2d').getImageData(pickX, pickY, 1, 1).data;
+                if (pixel[3] > 0) {
+                    const hex = '#' + [pixel[0], pixel[1], pixel[2]]
+                        .map(channel => channel.toString(16).padStart(2, '0')).join('');
+                    if (typeof PaletteManager !== 'undefined') {
+                        PaletteManager.setCurrentColor(hex);
+                    } else {
+                        State.setColor(hex);
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not sample colour:', error);
+            }
+            State.setDrawing(false);
+            return;
+        }
         
         // Calculate the logical tile coordinate (0 to 31) within the clicked canvas
         const tileX = Math.floor(x / Config.PIXEL_SIZE);

@@ -87,6 +87,13 @@ const FileManager = {
             throw new Error('Unsupported project version');
         }
         
+        // Restore the canvas resolution before recreating layers.
+        const tileDim = parseInt(data.settings?.tileDim, 10)
+            || Math.round(parseInt(data.settings?.canvasSize?.width, 10) / Config.PIXEL_SIZE);
+        if (tileDim && tileDim !== Config.TILE_DIM && typeof SettingsManager !== 'undefined') {
+            SettingsManager.resizeCanvas(tileDim, tileDim, { persist: false, silent: true });
+        }
+
         // Load basic settings
         if (data.settings) {
             if (data.settings.brushSize) {
@@ -111,11 +118,15 @@ const FileManager = {
         }
         
         // Load layers
-        if (data.layers && Array.isArray(data.layers)) {
-            LayerManager.loadLayerData(data.layers);
-        }
+        const layerLoad = (data.layers && Array.isArray(data.layers))
+            ? LayerManager.loadLayerData(data.layers)
+            : Promise.resolve();
         
         State.markSaved();
+        return layerLoad.then(() => {
+            if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+            return data;
+        });
     },
     
     // Create project data structure
@@ -293,6 +304,49 @@ const FileManager = {
             localStorage.setItem('tilemap-autosave', JSON.stringify(projectData));
         } catch (error) {
             console.error('Auto-save error:', error);
+        }
+    },
+
+    // Explicitly save the current project to browser storage
+    saveToBrowser() {
+        try {
+            const projectData = this.createProjectData();
+            localStorage.setItem('tilemap-browser-project', JSON.stringify(projectData));
+            localStorage.setItem('tilemap-autosave', JSON.stringify(projectData));
+            State.markSaved();
+            if (typeof Notifications !== 'undefined') {
+                new Notifications().success('Project saved to browser storage');
+            }
+        } catch (error) {
+            console.error('Browser save error:', error);
+            if (typeof Notifications !== 'undefined') {
+                new Notifications().error('Could not save to browser storage');
+            }
+        }
+    },
+
+    // Restore the project most recently saved to browser storage
+    async loadFromBrowser() {
+        try {
+            const stored = localStorage.getItem('tilemap-browser-project')
+                || localStorage.getItem('tilemap-autosave');
+            if (!stored) {
+                if (typeof Notifications !== 'undefined') {
+                    new Notifications().error('No browser-saved project was found');
+                }
+                return false;
+            }
+            await this.loadProjectData(JSON.parse(stored));
+            if (typeof Notifications !== 'undefined') {
+                new Notifications().success('Project restored from browser storage');
+            }
+            return true;
+        } catch (error) {
+            console.error('Browser load error:', error);
+            if (typeof Notifications !== 'undefined') {
+                new Notifications().error('Could not restore the browser-saved project');
+            }
+            return false;
         }
     },
     

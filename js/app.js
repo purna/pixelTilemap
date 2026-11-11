@@ -61,6 +61,7 @@ const App = {
         ToolManager.init();
         FileManager.init();
         SettingsManager.init();
+        TileLibrary.init();
         ZoomManager.init();
 
         // Initialize UI and Input handlers

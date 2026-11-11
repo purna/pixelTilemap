@@ -189,7 +189,9 @@ const LayerManager = {
     },
     
     moveLayer(index, direction) {
-        const newIndex = direction === 'up' ? index - 1 : index + 1;
+        // The layer list is displayed top-to-bottom in reverse array order.
+        // Moving visually up therefore means moving to a higher array index.
+        const newIndex = direction === 'up' ? index + 1 : index - 1;
         
         if (newIndex < 0 || newIndex >= State.layers.length) {
             return; // Can't move further
@@ -209,6 +211,7 @@ const LayerManager = {
         
         this.renderLayers();
         State.markUnsaved();
+        if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
     },
     
     // Drag and drop functionality for layer reordering
@@ -312,6 +315,30 @@ const LayerManager = {
         
         const index = parseInt(layerItem.dataset.index);
         
+        // Handle rename
+        if (e.target.closest('.rename-btn')) {
+            e.stopPropagation();
+            e.preventDefault();
+            const label = layerItem.querySelector('.layer-name-label');
+            const input = layerItem.querySelector('.layer-name-input');
+            if (label && input) DOM.startLayerRename(label, input, index);
+            return;
+        }
+
+        // Handle reorder buttons
+        if (e.target.closest('.move-up-btn')) {
+            e.stopPropagation();
+            e.preventDefault();
+            this.moveLayer(index, 'up');
+            return;
+        }
+        if (e.target.closest('.move-down-btn')) {
+            e.stopPropagation();
+            e.preventDefault();
+            this.moveLayer(index, 'down');
+            return;
+        }
+
         // Handle visibility toggle
         if (e.target.classList.contains('visibility-btn') || e.target.closest('.visibility-btn')) {
             e.stopPropagation();
@@ -388,8 +415,8 @@ const LayerManager = {
         
         const menuItems = [
             { text: 'Duplicate Layer', action: () => this.duplicateLayer(index) },
-            { text: 'Move Up', action: () => this.moveLayer(index, 'up'), disabled: index === 0 },
-            { text: 'Move Down', action: () => this.moveLayer(index, 'down'), disabled: index === State.layers.length - 1 },
+            { text: 'Move Up', action: () => this.moveLayer(index, 'up'), disabled: index === State.layers.length - 1 },
+            { text: 'Move Down', action: () => this.moveLayer(index, 'down'), disabled: index === 0 },
             { text: '---', separator: true },
             { text: 'Delete Layer', action: () => {
                 // Check if the layer exists before trying to access its name
@@ -469,25 +496,38 @@ const LayerManager = {
         State.layers = [];
         State.activeLayerIndex = 0;
         
-        layerData.forEach((data, index) => {
+        const imageLoads = layerData.map((data, index) => {
             const layer = {
                 id: Date.now() + index,
-                name: data.name,
-                visible: data.visible,
-                opacity: data.opacity,
+                name: data.name || `Layer ${index + 1}`,
+                visible: data.visible !== false,
+                opacity: data.opacity !== undefined ? data.opacity : 1,
                 canvas: State.createLayerCanvas()
             };
             
-            // Load image data
-            const img = new Image();
-            img.onload = () => {
-                layer.canvas.getContext('2d').drawImage(img, 0, 0);
-            };
-            img.src = data.imageData;
-            
             State.layers.push(layer);
+            if (!data.imageData) return Promise.resolve();
+
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    layer.canvas.getContext('2d').drawImage(img, 0, 0);
+                    if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+                    resolve();
+                };
+                img.onerror = () => resolve();
+                img.src = data.imageData;
+            });
         });
-        
+
+        if (State.layers.length === 0) {
+            State.addLayer('Layer 1');
+        }
+
         this.renderLayers();
+        return Promise.all(imageLoads).then(() => {
+            this.renderLayers();
+            if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+        });
     }
 };
