@@ -2887,59 +2887,72 @@ input[type="range"]::-moz-range-thumb {
     line-height: 1.45;
 }
 
-/* Floating recent colours */
-.recent-colors {
+/* Floating colour history (matches Pixel Art Studio) */
+.floating-color-history {
     position: fixed;
-    left: 18px;
-    bottom: 18px;
-    z-index: 950;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 999px;
-    background: rgba(26, 26, 46, 0.94);
+    top: 50%;
+    left: 140px;
+    transform: translateY(-50%);
+    z-index: 1000;
+    background: var(--bg-light);
     border: 1px solid var(--border-color);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: move;
     user-select: none;
 }
 
-.recent-colors-label {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    color: var(--accent-tertiary);
-    font-size: 0.72rem;
-    border-right: 1px solid var(--border-color);
-    padding-right: 8px;
+.floating-color-history .grippy {
+    display: block;
+    cursor: move;
+    margin: 0 auto;
+    color: #cccccc;
+    text-shadow: 1px 0 1px black;
 }
 
-.recent-colors-swatches {
+.floating-color-history .grippy::before {
+    content: '\f58d';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 12px;
+}
+
+.color-history-swatches {
     display: flex;
-    gap: 5px;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.recent-swatch {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.16);
+.floating-color-history .color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
 }
 
-.recent-swatch:hover {
-    transform: translateY(-2px) scale(1.06);
-    border-color: rgba(255, 255, 255, 0.55);
+.floating-color-history .color-swatch:hover {
+    transform: scale(1.1);
+    border-color: var(--accent-primary);
 }
 
-.recent-swatch.active {
+.floating-color-history .color-swatch.active {
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.25);
+}
+
+.color-history-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 2px;
+    font-family: 'Inter', sans-serif;
 }
 
 /* Compact layer controls for reordering and renaming */

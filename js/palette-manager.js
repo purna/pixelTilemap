@@ -7,6 +7,8 @@ const PaletteManager = {
         this.renderPalette();
         this.renderRecentColors();
         this.setupEventListeners();
+        this.setupColorHistoryDrag();
+        this.setupColorHistoryShortcuts();
         console.log('Palette Manager initialized');
     },
     
@@ -56,27 +58,85 @@ const PaletteManager = {
             }
         });
 
-        // Floating recent-colour palette
+        // Floating colour history palette
         const recentContainer = document.getElementById('recent-colors-swatches');
         if (recentContainer) {
             recentContainer.addEventListener('click', (event) => {
-                const swatch = event.target.closest('.recent-swatch');
+                const swatch = event.target.closest('.color-swatch');
                 if (!swatch) return;
                 this.setCurrentColor(swatch.dataset.color);
             });
         }
     },
 
+    setupColorHistoryShortcuts() {
+        document.addEventListener('keydown', (event) => {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.ctrlKey || event.metaKey || event.altKey) return;
+            const index = parseInt(event.key, 10) - 1;
+            if (index < 0 || index > 3) return;
+            const color = State.recentColors[index];
+            if (color) {
+                this.setCurrentColor(color);
+                event.preventDefault();
+            }
+        });
+    },
+
+    setupColorHistoryDrag() {
+        const element = document.getElementById('recent-colors');
+        if (!element) return;
+
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        element.addEventListener('mousedown', (event) => {
+            if (event.target.closest('.color-swatch') || event.target.closest('button')) return;
+            isDragging = true;
+            const rect = element.getBoundingClientRect();
+            offsetX = event.clientX - rect.left;
+            offsetY = event.clientY - rect.top;
+            element.style.transform = 'none';
+            element.style.cursor = 'grabbing';
+            event.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            if (!isDragging) return;
+            const width = element.offsetWidth;
+            const height = element.offsetHeight;
+            const x = Math.max(6, Math.min(window.innerWidth - width - 6, event.clientX - offsetX));
+            const y = Math.max(6, Math.min(window.innerHeight - height - 6, event.clientY - offsetY));
+            element.style.left = `${x}px`;
+            element.style.top = `${y}px`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            element.style.cursor = 'move';
+        });
+
+        element.addEventListener('dblclick', (event) => {
+            if (event.target.closest('.color-swatch')) return;
+            element.style.left = '140px';
+            element.style.top = '50%';
+            element.style.transform = 'translateY(-50%)';
+        });
+    },
+
     renderRecentColors() {
         const container = document.getElementById('recent-colors-swatches');
         if (!container) return;
         container.innerHTML = '';
-        State.recentColors.slice(0, 4).forEach(color => {
-            const swatch = document.createElement('button');
-            swatch.type = 'button';
-            swatch.className = 'recent-swatch';
+        State.recentColors.slice(0, 4).forEach((color, index) => {
+            const swatch = document.createElement('div');
+            swatch.className = 'color-swatch';
             swatch.dataset.color = color;
-            swatch.title = color;
+            swatch.dataset.colorIndex = index;
+            swatch.title = `Recent Color ${index + 1} (Press ${index + 1})`;
+            swatch.setAttribute('role', 'button');
+            swatch.setAttribute('tabindex', '0');
             swatch.setAttribute('aria-label', `Use recent colour ${color}`);
             swatch.style.backgroundColor = color;
             if (color.toLowerCase() === String(State.currentColor).toLowerCase()) {

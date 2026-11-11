@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
     <!-- Local Font Awesome Implementation -->
     <link rel="stylesheet" href="fonts/fontawesome-free-6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=2">
+    <link rel="stylesheet" href="css/styles.css?v=3">
     <link rel="stylesheet" href="css/tutorials.css">
      <!-- Custom Fonts -->
     <style>
@@ -613,42 +613,43 @@
     <input type="file" id="fileInput" accept=".json" style="display: none;">
     <input type="file" id="paletteFileInput" accept=".ase" style="display: none;">
 
-    <!-- Floating recent colours -->
-    <div id="recent-colors" class="recent-colors" role="group" aria-label="Recently used colours">
-        <span class="recent-colors-label" title="Last 4 colours used"><i class="fas fa-history"></i></span>
-        <div id="recent-colors-swatches" class="recent-colors-swatches"></div>
+    <!-- Floating colour history (matches Pixel Art Studio) -->
+    <div id="recent-colors" class="floating-color-history" role="group" aria-label="Recently used colours">
+        <span class="grippy" title="Drag to move"></span>
+        <div id="recent-colors-swatches" class="color-history-swatches"></div>
+        <div class="color-history-label">Recent</div>
     </div>
 
     <!-- Core modules -->
-    <script src="js/config.js?v=2"></script>
-    <script src="js/state.js?v=2"></script>
-    <script src="js/dom.js?v=2"></script>
+    <script src="js/config.js?v=3"></script>
+    <script src="js/state.js?v=3"></script>
+    <script src="js/dom.js?v=3"></script>
     <script src="js/notifications.js"></script>
 
     <!-- UI Components -->
-    <script src="js/tooltip.js?v=2"></script>
+    <script src="js/tooltip.js?v=3"></script>
 
     <!-- Specialized modules -->
-    <script src="js/tilemap-core.js?v=2"></script>
-    <script src="js/palette-manager.js?v=2"></script>
-    <script src="js/layer-manager.js?v=2"></script>
-    <script src="js/tool-manager.js?v=2"></script>
-    <script src="js/file-manager.js?v=2"></script>
-    <script src="js/tilemap-manager.js?v=2"></script>
-    <script src="js/tile-library.js?v=2"></script>
-    <script src="js/settings-manager.js?v=2"></script>
-    <script src="js/zoom-manager.js?v=2"></script>
+    <script src="js/tilemap-core.js?v=3"></script>
+    <script src="js/palette-manager.js?v=3"></script>
+    <script src="js/layer-manager.js?v=3"></script>
+    <script src="js/tool-manager.js?v=3"></script>
+    <script src="js/file-manager.js?v=3"></script>
+    <script src="js/tilemap-manager.js?v=3"></script>
+    <script src="js/tile-library.js?v=3"></script>
+    <script src="js/settings-manager.js?v=3"></script>
+    <script src="js/zoom-manager.js?v=3"></script>
     <script src="js/tutorialConfig.js"></script>
     <script src="js/tutorialSystem.js"></script>
 
     <!-- Input handling -->
-    <script src="js/input-handler.js?v=2"></script>
-    <script src="js/ui-manager.js?v=2"></script>
+    <script src="js/input-handler.js?v=3"></script>
+    <script src="js/ui-manager.js?v=3"></script>
 
     <!-- Main application -->
-    <script src="js/app.js?v=2"></script>
-    <script src="js/ai-provider.js?v=2" data-app-id="pixelTilemap"></script>
-    <script src="js/ai-creator.js?v=2" data-app-id="pixelTilemap"></script>
+    <script src="js/app.js?v=3"></script>
+    <script src="js/ai-provider.js?v=3" data-app-id="pixelTilemap"></script>
+    <script src="js/ai-creator.js?v=3" data-app-id="pixelTilemap"></script>
 </body>
 
 </html>

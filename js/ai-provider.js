@@ -168,52 +168,157 @@
         style.id = 'pixel-ai-settings-styles';
         style.textContent = `
             .pixel-ai-provider-fields[hidden], #pixel-ai-openrouter-model-list[hidden] { display:none !important; }
+
+            /* Match the Pixel Art Studio settings typography and form controls. */
             .pixel-ai-form { padding:2px 0 16px; }
-            .pixel-ai-form h3 { margin:0 0 6px; font-size:1.05rem; color:var(--accent-secondary, #c084fc); letter-spacing:.01em; }
-            .pixel-ai-help { margin:0 0 16px; font-size:.8rem; line-height:1.55; color:var(--text-secondary, #94a3b8); }
-            .pixel-ai-form label { display:block; margin:14px 0 6px; font-size:.8rem; font-weight:600; color:var(--text-primary, #e2e8f0); }
+            .pixel-ai-form h3 {
+                margin:0 0 15px;
+                color:var(--accent-tertiary, #00d9ff);
+                font-size:1.1em;
+                font-weight:500;
+                text-transform:uppercase;
+                letter-spacing:1px;
+            }
+            .pixel-ai-help {
+                margin:0 0 15px;
+                color:var(--text-secondary, #94a3b8);
+                font-size:0.8rem;
+                line-height:1.5;
+            }
+            .pixel-ai-form label {
+                display:block;
+                width:100%;
+                margin:12px 0 6px;
+                color:var(--text-primary, #e0e7ff);
+                font-size:0.75rem;
+                font-weight:500;
+                text-align:left;
+            }
             .pixel-ai-form input[type="text"],
             .pixel-ai-form input[type="password"],
             .pixel-ai-form select {
-                box-sizing:border-box; width:100%; padding:10px 12px;
-                background:var(--bg-dark, #121222); color:var(--text-primary, #e2e8f0);
-                border:1px solid var(--border-color, #334155); border-radius:7px;
-                font:inherit; font-size:.82rem; outline:none;
-                transition:border-color .15s ease, box-shadow .15s ease;
+                box-sizing:border-box;
+                width:100%;
+                margin-top:0;
+                padding:6px 10px;
+                background:var(--bg-light, #1e293b);
+                color:var(--text-primary, #e0e7ff);
+                border:1px solid var(--border-color, #2d3748);
+                border-radius:4px;
+                font:inherit;
+                font-size:0.8rem;
+                cursor:text;
+                outline:none;
+                transition:all 0.2s;
             }
+            .pixel-ai-form select { cursor:pointer; }
             .pixel-ai-form input[type="text"]:focus,
             .pixel-ai-form input[type="password"]:focus,
             .pixel-ai-form select:focus {
                 border-color:var(--accent-primary, #00ff41);
-                box-shadow:0 0 0 3px rgba(0,255,65,.12);
+                box-shadow:0 0 8px var(--border-glow, rgba(0,255,65,0.3));
             }
-            .pixel-ai-form select option { background:var(--bg-dark, #121222); color:var(--text-primary, #e2e8f0); }
+            .pixel-ai-form select option {
+                background:var(--bg-dark, #1a1a2e);
+                color:var(--text-primary, #e0e7ff);
+            }
             .pixel-ai-provider-fields {
-                margin-top:14px; padding:14px; border-radius:9px;
-                background:var(--bg-medium, #1b1b2f); border:1px solid var(--border-color, #334155);
+                margin-top:14px;
+                padding:12px;
+                background:var(--bg-light, #1e293b);
+                border:1px solid var(--border-color, #2d3748);
+                border-radius:6px;
             }
             .pixel-ai-provider-fields label:first-child { margin-top:0; }
-            .pixel-ai-provider-fields input[type="checkbox"] { width:16px; height:16px; margin:0 8px 0 0; vertical-align:-3px; accent-color:var(--accent-primary, #00ff41); }
-            .pixel-ai-form .pixel-ai-load-models { margin-top:10px; }
+            .pixel-ai-provider-fields input[type="checkbox"] {
+                width:16px;
+                height:16px;
+                margin:0 8px 0 0;
+                vertical-align:-3px;
+                accent-color:var(--accent-primary, #00ff41);
+            }
+            .pixel-ai-provider-fields label:has(input[type="checkbox"]) {
+                display:flex;
+                align-items:flex-start;
+                gap:6px;
+                line-height:1.4;
+            }
             .pixel-ai-status {
-                min-height:20px; margin:16px 0 8px; padding:9px 11px;
-                background:var(--bg-medium, #1b1b2f); border:1px solid var(--border-color, #334155);
-                border-radius:6px; font-size:.78rem; line-height:1.45; color:var(--text-secondary, #94a3b8);
+                min-height:20px;
+                margin:16px 0 8px;
+                padding:9px 11px;
+                background:var(--bg-light, #1e293b);
+                border:1px solid var(--border-color, #2d3748);
+                border-radius:4px;
+                color:var(--text-secondary, #94a3b8);
+                font-size:0.78rem;
+                line-height:1.45;
             }
             .pixel-ai-form .pixel-ai-test,
             .pixel-ai-form .pixel-ai-save {
-                margin:8px 8px 0 0; padding:9px 14px; border-radius:7px; cursor:pointer;
-                font:600 .8rem 'Inter', system-ui, sans-serif;
-                background:var(--bg-light, #26263d); color:var(--text-primary, #e2e8f0);
-                border:1px solid var(--border-color, #3f3f5c);
-                transition:background .15s ease, border-color .15s ease, filter .15s ease;
+                box-sizing:border-box;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:6px;
+                width:100%;
+                margin:8px 0 0;
+                padding:8px 12px;
+                border-radius:4px;
+                font-family:inherit;
+                font-size:12px;
+                cursor:pointer;
+                transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             }
-            .pixel-ai-form .pixel-ai-test:hover,
-            .pixel-ai-form .pixel-ai-save:hover { background:var(--bg-medium, #32324d); border-color:var(--text-secondary, #64748b); }
-            .pixel-ai-form .pixel-ai-test { background:rgba(0,217,255,.1); border-color:rgba(0,217,255,.4); color:var(--accent-tertiary, #7dd3fc); }
-            .pixel-ai-form .pixel-ai-save { background:var(--accent-primary, #00ff41); border-color:var(--accent-primary, #00ff41); color:#001b08; }
-            .pixel-ai-form .pixel-ai-save:hover { filter:brightness(1.06); background:var(--accent-primary, #00ff41); }
-            .pixel-ai-form .pixel-ai-load-models { padding:8px 12px; border-radius:6px; cursor:pointer; border:1px solid var(--border-color, #334155); background:var(--bg-light, #26263d); color:var(--text-primary, #e2e8f0); }
+            .pixel-ai-form .pixel-ai-test {
+                background:var(--bg-light, #1e293b);
+                color:var(--text-primary, #e0e7ff);
+                border:1px solid var(--border-color, #2d3748);
+                box-shadow:0 1px 2px rgba(0,0,0,0.1);
+            }
+            .pixel-ai-form .pixel-ai-test:hover {
+                background:var(--bg-medium, #16213e);
+                border-color:var(--text-secondary, #94a3b8);
+                transform:translateY(-1px);
+                box-shadow:0 2px 6px rgba(0,0,0,0.15);
+            }
+            .pixel-ai-form .pixel-ai-test:active { transform:translateY(0); }
+            .pixel-ai-form .pixel-ai-save {
+                background:var(--accent-primary, #00ff41);
+                color:#000;
+                border:none;
+                font-weight:bold;
+                box-shadow:0 0 10px rgba(0,255,65,0.2);
+                animation:pixelAiSubtlePulse 2s ease infinite;
+            }
+            .pixel-ai-form .pixel-ai-save:hover {
+                box-shadow:0 0 15px rgba(0,255,65,0.3);
+                transform:translateY(-1px) scale(1.02);
+            }
+            .pixel-ai-form .pixel-ai-load-models {
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:6px;
+                width:100%;
+                margin-top:8px;
+                padding:8px 12px;
+                background:var(--bg-medium, #16213e);
+                color:var(--text-secondary, #94a3b8);
+                border:1px solid var(--border-color, #2d3748);
+                border-radius:4px;
+                font-size:12px;
+                cursor:pointer;
+                transition:all 0.2s;
+            }
+            .pixel-ai-form .pixel-ai-load-models:hover {
+                background:var(--bg-light, #1e293b);
+                color:var(--text-primary, #e0e7ff);
+            }
+            @keyframes pixelAiSubtlePulse {
+                0%, 100% { box-shadow:0 0 10px rgba(0,255,65,0.2); }
+                50% { box-shadow:0 0 16px rgba(0,255,65,0.38); }
+            }
         `;
         document.head.appendChild(style);
     }
@@ -257,19 +362,19 @@
                 </select>
                 <div class="pixel-ai-provider-fields" data-provider="gemini">
                     <label for="pixel-ai-gemini-key-${index}">Gemini API key</label><input id="pixel-ai-gemini-key-${index}" type="password" autocomplete="off">
-                    <label for="pixel-ai-gemini-model-${index}">Gemini model</label><input id="pixel-ai-gemini-model-${index}" value="gemini-3.8-flash">
+                    <label for="pixel-ai-gemini-model-${index}">Gemini model</label><input id="pixel-ai-gemini-model-${index}" type="text" value="gemini-3.8-flash">
                 </div>
                 <div class="pixel-ai-provider-fields" data-provider="openai" hidden>
                     <label for="pixel-ai-openai-key-${index}">OpenAI API key</label><input id="pixel-ai-openai-key-${index}" type="password" autocomplete="off">
-                    <label for="pixel-ai-openai-model-${index}">OpenAI model</label><input id="pixel-ai-openai-model-${index}" value="gpt-4.1-mini">
+                    <label for="pixel-ai-openai-model-${index}">OpenAI model</label><input id="pixel-ai-openai-model-${index}" type="text" value="gpt-4.1-mini">
                 </div>
                 <div class="pixel-ai-provider-fields" data-provider="claude" hidden>
                     <label for="pixel-ai-claude-key-${index}">Claude API key</label><input id="pixel-ai-claude-key-${index}" type="password" autocomplete="off">
-                    <label for="pixel-ai-claude-model-${index}">Claude model</label><input id="pixel-ai-claude-model-${index}" value="claude-sonnet-5">
+                    <label for="pixel-ai-claude-model-${index}">Claude model</label><input id="pixel-ai-claude-model-${index}" type="text" value="claude-sonnet-5">
                 </div>
                 <div class="pixel-ai-provider-fields" data-provider="openrouter" hidden>
                     <label for="pixel-ai-openrouter-key-${index}">OpenRouter API key</label><input id="pixel-ai-openrouter-key-${index}" type="password" autocomplete="off">
-                    <label for="pixel-ai-openrouter-model-${index}">OpenRouter model</label><input id="pixel-ai-openrouter-model-${index}" value="openrouter/auto">
+                    <label for="pixel-ai-openrouter-model-${index}">OpenRouter model</label><input id="pixel-ai-openrouter-model-${index}" type="text" value="openrouter/auto">
                     <button type="button" class="pixel-ai-load-models">Load free models</button>
                     <select id="pixel-ai-openrouter-model-list" hidden><option value="">Choose a free model…</option></select>
                     <label><input type="checkbox" class="pixel-ai-fallback"> Try the next free model when this OpenRouter model is limited</label>
