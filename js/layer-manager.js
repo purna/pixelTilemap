@@ -2,7 +2,10 @@
 // Layer management functionality
 
 const LayerManager = {
+    initialized: false,
     init() {
+        if (this.initialized) return;
+        this.initialized = true;
         this.setupEventListeners();
         this.createDefaultLayer();
         console.log('Layer Manager initialized');

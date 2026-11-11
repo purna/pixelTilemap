@@ -3,6 +3,7 @@
 
 const SettingsManager = {
     isOpen: false,
+    initialized: false,
     modalListenersSetup: false,
     settings: {
         showGrid: true,
@@ -19,6 +20,8 @@ const SettingsManager = {
     },
 
     init() {
+        if (this.initialized) return;
+        this.initialized = true;
         console.log('Initializing Settings Manager...');
         
         // Initialize canvas size from config if not set
@@ -70,6 +73,7 @@ const SettingsManager = {
                 e.stopPropagation();
                 this.toggleSettings();
             });
+            settingsBtn.setAttribute('data-settings-listener', 'true');
         } else {
             console.error('Settings button not found!');
         }
