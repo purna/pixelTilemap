@@ -2969,3 +2969,29 @@ input[type="range"]::-moz-range-thumb {
     #unified-settings-modal .modal footer { padding: 14px 16px 18px; }
     .recent-colors { left: 10px; bottom: 10px; }
 }
+
+/* Breathing room between the settings tabs and the active panel */
+#unified-settings-modal .settings-tabs {
+    margin-bottom: 12px;
+}
+
+#unified-settings-modal .tiles-settings-content > .tile-library-intro:first-child {
+    margin-top: 2px;
+}
+
+/* The page-level header is a fixed 60px flex bar; modal headers must not inherit it. */
+#unified-settings-modal .modal header {
+    height: auto;
+    min-height: 0;
+    display: block;
+    align-items: initial;
+    justify-content: initial;
+    background: transparent;
+    border-bottom: 0;
+    padding: 22px 26px 0;
+    margin: 0;
+}
+
+#unified-settings-modal .modal header > div {
+    width: 100%;
+}
