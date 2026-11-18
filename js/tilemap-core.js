@@ -86,14 +86,10 @@ const TilemapCore = {
         
         if (!clientX || !clientY) return;
         
-        let x = clientX - rect.left;
-        let y = clientY - rect.top;
-        
-        // Account for zoom when calculating coordinates
-        // When the grid is scaled, mouse coordinates need to be adjusted
-        const scale = State.zoom;
-        x = x / scale;
-        y = y / scale;
+        // Map screen coordinates to canvas buffer coordinates.
+        // This accounts for CSS display scaling (responsive sizes) and zoom transforms.
+        let x = ((clientX - rect.left) / rect.width) * targetCanvas.width;
+        let y = ((clientY - rect.top) / rect.height) * targetCanvas.height;
 
         // Colour picker: sample the clicked canvas instead of painting.
         if (State.currentTool === 'eyedropper') {
