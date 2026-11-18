@@ -375,6 +375,20 @@ header.ds-header {
     letter-spacing: 0.02em;
 }
 
+/* The legacy stylesheet forced the pixel/cyan font on every span inside the
+   tool options. Keep the accent colour on pills, but use the app UI font. */
+#panel-tool-options span {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+#panel-tool-options .ds-pill {
+    font-family: var(--font);
+    font-size: 10px;
+    color: var(--cyan);
+}
+
 .ds-pill {
     display: inline-flex;
     align-items: center;
