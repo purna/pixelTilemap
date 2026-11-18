@@ -591,6 +591,7 @@ const SettingsManager = {
         if (persist) this.saveSettingsToStorage();
         if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
         if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
+        if (typeof State !== 'undefined' && State.updateUI) State.updateUI();
 
         console.log(`Canvas resized to ${width}×${height} (${newCanvasSize}px)`);
         return true;

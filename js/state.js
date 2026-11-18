@@ -199,10 +199,12 @@ const State = {
     
     markUnsaved() {
         this.hasUnsavedChanges = true;
+        this.updateSaveState();
     },
     
     markSaved() {
         this.hasUnsavedChanges = false;
+        this.updateSaveState();
     },
     
     saveState() {
@@ -299,8 +301,12 @@ const State = {
         // Update opacity controls
         const opacitySlider = document.getElementById('opacitySlider');
         const opacityDisplay = document.getElementById('opacityDisplay');
+        const opacityHeader = document.getElementById('opacityHeaderValue');
+        const floatingOpacity = document.getElementById('brush-opacity');
         if (opacitySlider) opacitySlider.value = this.opacity * 100;
         if (opacityDisplay) opacityDisplay.textContent = Math.round(this.opacity * 100);
+        if (opacityHeader) opacityHeader.textContent = `${Math.round(this.opacity * 100)}%`;
+        if (floatingOpacity) floatingOpacity.value = this.opacity * 100;
         
         // Update panel visibility
         const layersPanel = document.getElementById('panel-layers');
@@ -313,6 +319,33 @@ const State = {
         const zoomDisplay = document.getElementById('zoomDisplay');
         if (zoomDisplay) {
             zoomDisplay.textContent = `${this.zoom.toFixed(1)}x`;
+        }
+
+        // Update studio chrome (header badges + footer)
+        const zoomBadge = document.getElementById('zoomBadge');
+        const footerZoom = document.getElementById('footerZoom');
+        const zoomText = `${this.zoom.toFixed(1)}×`;
+        if (zoomBadge) zoomBadge.textContent = zoomText;
+        if (footerZoom) footerZoom.textContent = `Zoom ${zoomText}`;
+
+        const tileDim = (typeof Config !== 'undefined' && Config.TILE_DIM) || 32;
+        const canvasBadge = document.getElementById('canvasBadge');
+        const footerCanvas = document.getElementById('footerCanvas');
+        if (canvasBadge) canvasBadge.textContent = `${tileDim} × ${tileDim} px`;
+        if (footerCanvas) footerCanvas.textContent = `Canvas ${tileDim} × ${tileDim}`;
+
+        this.updateSaveState();
+    },
+
+    updateSaveState() {
+        const saveState = document.getElementById('saveState');
+        const footerStatus = document.getElementById('footerStatus');
+        if (saveState) {
+            saveState.textContent = this.hasUnsavedChanges ? 'Unsaved changes' : 'Saved';
+            saveState.classList.toggle('dirty', this.hasUnsavedChanges);
+        }
+        if (footerStatus) {
+            footerStatus.textContent = this.hasUnsavedChanges ? 'Unsaved changes' : 'Ready';
         }
     }
 };

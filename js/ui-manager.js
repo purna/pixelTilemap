@@ -2,9 +2,17 @@
 // UI state management and panel control for the Seamless Tilemap Editor
 
 const UIManager = {
+    panelWidth: 316,
+
+    getPanelWidth(panel) {
+        const measured = panel && panel.getBoundingClientRect ? Math.round(panel.getBoundingClientRect().width) : 0;
+        return measured > 0 ? measured : this.panelWidth;
+    },
+
     init() {
         console.log('Initializing UI Manager...');
         this.setupPanelToggle();
+        this.setupProjectName();
         this.setupContextSwitching();
         this.setupBrushControlsDrag();
         this.setupSettingsTabs();
@@ -16,6 +24,27 @@ const UIManager = {
         this.updatePanelForTool('pencil');
 
         console.log('UI Manager initialized successfully');
+    },
+
+    setupProjectName() {
+        const input = document.getElementById('projectNameInput');
+        if (!input) return;
+
+        try {
+            const saved = localStorage.getItem('tilemap-project-name');
+            if (saved) input.value = saved;
+        } catch (e) {
+            // Storage may be unavailable.
+        }
+
+        input.addEventListener('input', () => {
+            try {
+                localStorage.setItem('tilemap-project-name', input.value);
+            } catch (e) {
+                // Storage may be unavailable.
+            }
+            if (typeof State !== 'undefined' && State.markUnsaved) State.markUnsaved();
+        });
     },
 
     setupPanelToggle() {
@@ -34,9 +63,9 @@ const UIManager = {
                 panel.style.display = 'none';
             } else {
                 icon.className = 'fas fa-chevron-right';
-                toggleBtn.style.right = '300px';
                 mainContainer?.classList.remove('panel-closed');
                 panel.style.display = 'flex';
+                toggleBtn.style.right = `${this.getPanelWidth(panel)}px`;
             }
             
             // Save state
@@ -535,7 +564,7 @@ const UIManager = {
                         panel.classList.remove('closed');
                         panel.style.display = 'flex';
                         toggleIcon.className = 'fas fa-chevron-right';
-                        toggleBtn.style.right = '300px';
+                        toggleBtn.style.right = `${this.getPanelWidth(panel)}px`;
                         mainContainer?.classList.remove('panel-closed');
                     }
                 }
