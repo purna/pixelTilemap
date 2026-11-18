@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="css/tutorials.css">
     <!-- Studio layout + design layer (loads last) -->
     <link rel="stylesheet" href="css/studio.css?v=11">
+    <link rel="stylesheet" href="css/atlas.css?v=1">
     <!-- Custom Fonts -->
     <style>
         @font-face {
@@ -150,6 +151,10 @@
                             data-tooltip="**Saved Tiles**\n--Your tile library--\n\n• Save the current tile\n• Reopen a tile to edit">
                             <i class="fas fa-table-cells-large"></i><span>Tiles</span><small>Your library</small>
                         </button>
+                        <button id="atlasBtn" class="ds-view-btn" title="Tile Atlas"
+                            data-tooltip="**Tile Atlas**\n--Auto-tile mask atlas--\n\n• 4×4 or 3×3 mask layout\n• Edit individual masks\n• Load starter packs">
+                            <i class="fas fa-table-cells"></i><span>Atlas</span><small>Auto-tile masks</small>
+                        </button>
                     </div>
                 </section>
 
@@ -212,6 +217,42 @@
                                 check seams. Use <strong>Centre line</strong> to show or hide the guide around the selected
                                 tile. Hold <strong>Shift</strong> with any tool for a quick erase. Drawing only stops when
                                 you release the mouse button or lift your finger.</p>
+                        </div>
+                    </section>
+
+                    <!-- Neighbour Preview -->
+                    <section class="ds-card ds-neighbour-card">
+                        <div class="ds-card-head">
+                            <div>
+                                <h2><i class="fas fa-border-none"></i> Neighbour Preview</h2>
+                                <p class="ds-subtitle">Live dual-grid auto-tiling from the tiles in the Tile Atlas.</p>
+                            </div>
+                            <div class="ds-badges">
+                                <span id="neighbourModeBadge" class="ds-badge">16 masks</span>
+                                <span id="neighbourMapBadge" class="ds-badge">16 × 9 map</span>
+                            </div>
+                        </div>
+                        <div class="neighbour-stage">
+                            <canvas id="neighbour-preview" width="512" height="288"
+                                aria-label="Dual-grid neighbour preview"></canvas>
+                        </div>
+                        <div class="neighbour-toolbar">
+                            <button type="button" class="btn compact" id="neighbourRandomBtn" title="Generate a new test map">
+                                <i class="fas fa-shuffle"></i> Random
+                            </button>
+                            <button type="button" class="btn compact" id="neighbourClearBtn" title="Clear the test map">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                            <button type="button" class="btn compact" id="neighbourFillBtn" title="Fill the test map">
+                                <i class="fas fa-square"></i> Fill
+                            </button>
+                            <button type="button" class="btn compact" id="neighbourAtlasBtn" title="Open the Tile Atlas">
+                                <i class="fas fa-table-cells"></i> Atlas
+                            </button>
+                            <button type="button" class="btn compact" id="neighbourExportBtn" title="Export the preview as a PNG">
+                                <i class="fas fa-download"></i> PNG
+                            </button>
+                            <span class="ds-check-hint">Click a cell to toggle terrain; right-click clears it.</span>
                         </div>
                     </section>
                 </div>
@@ -435,6 +476,40 @@
                     </div>
                 </section>
 
+                <!-- Tile Atlas Section -->
+                <section id="panel-atlas" class="panel-section hidden">
+                    <div class="section-title">
+                        <span><i class="fas fa-table-cells"></i> Tile Atlas</span>
+                        <div class="ds-head-actions">
+                            <button id="atlasExportBtn" class="ds-mini-btn" title="Export the atlas as a PNG">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="atlas-pack-row">
+                        <select id="atlasPackSelect" class="atlas-select" aria-label="Starter tile pack">
+                            <!-- Filled by TileAtlas -->
+                        </select>
+                        <button type="button" id="atlasLoadPackBtn" class="btn compact primary" title="Load this starter pack into the atlas">
+                            Load
+                        </button>
+                    </div>
+                    <div class="atlas-mode-row" id="atlasModeToggle" role="group" aria-label="Atlas layout">
+                        <button type="button" data-atlas-mode="16" class="active">4 × 4 · 16 masks</button>
+                        <button type="button" data-atlas-mode="9">3 × 3 · 9 masks</button>
+                    </div>
+                    <div id="atlas-grid" class="atlas-grid" aria-label="Tile atlas masks"></div>
+                    <p class="ds-check-hint">Click a mask to load it into the editor. Finishing a stroke saves it back to the atlas and refreshes the neighbour preview.</p>
+                    <div class="atlas-actions">
+                        <button type="button" id="atlasEditSelectedBtn" class="btn compact">
+                            <i class="fas fa-pen"></i> Edit selected
+                        </button>
+                        <button type="button" id="atlasResetBtn" class="btn compact secondary">
+                            <i class="fas fa-rotate-left"></i> Reset pack
+                        </button>
+                    </div>
+                </section>
+
             </aside>
         </div>
 
@@ -445,6 +520,8 @@
                 <span>Tilemap Editor</span>
                 <span class="ds-footer-dot">•</span>
                 <span id="footerStatus">Ready</span>
+                <span class="ds-footer-dot">•</span>
+                <button type="button" id="creditsBtn" class="ds-footer-link" title="Tilesets and technology credits">Credits</button>
             </div>
             <div class="ds-footer-right">
                 <span id="footerCanvas">Canvas 32 × 32</span>
@@ -738,6 +815,24 @@
     <input type="file" id="fileInput" accept=".json" style="display: none;">
     <input type="file" id="paletteFileInput" accept=".ase" style="display: none;">
 
+    <!-- CREDITS MODAL -->
+    <div class="modal-overlay" id="credits-modal">
+        <div class="modal credits-modal">
+            <header>
+                <div class="modal-title"><i class="fas fa-award"></i> Credits</div>
+                <div class="credits-subtitle">Tilesets, tools and technology used in Tilemap Editor.</div>
+            </header>
+            <div class="modal-content-wrapper">
+                <div id="credits-content" class="credits-content"></div>
+            </div>
+            <footer>
+                <div class="modal-actions">
+                    <button class="btn primary" id="credits-close">Close</button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
     <!-- Floating colour history (matches Pixel Art Studio) -->
     <div id="recent-colors" class="floating-color-history" role="group" aria-label="Recently used colours">
         <span class="grippy" title="Drag to move"></span>
@@ -756,6 +851,7 @@
 
     <!-- Specialized modules -->
     <script src="js/tilemap-core.js?v=14"></script>
+    <script src="js/tile-atlas.js?v=1"></script>
     <script src="js/palette-manager.js?v=8"></script>
     <script src="js/layer-manager.js?v=8"></script>
     <script src="js/tool-manager.js?v=15"></script>

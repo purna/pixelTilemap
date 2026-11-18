@@ -1,0 +1,323 @@
+/* ============================================================
+   Tile Atlas + Neighbour Preview + Credits
+   ============================================================ */
+
+/* ---------- Atlas panel ---------- */
+
+.atlas-pack-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.atlas-select {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 30px;
+    padding: 0 8px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.atlas-select:focus {
+    outline: none;
+    border-color: var(--green);
+}
+
+.atlas-pack-row .btn.compact {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    font-size: 10.5px;
+}
+
+.atlas-mode-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.atlas-mode-row button {
+    flex: 1 1 50%;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    transition: all 0.15s ease;
+}
+
+.atlas-mode-row button:hover {
+    color: var(--text);
+    background: var(--bg-3);
+}
+
+.atlas-mode-row button.active {
+    color: #09210a;
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 10px rgba(126, 224, 74, 0.22);
+}
+
+.atlas-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.atlas-grid.mode-9 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.atlas-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    padding: 4px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    color: var(--muted);
+    text-align: left;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.atlas-tile:hover {
+    border-color: var(--cyan);
+    background: var(--bg-3);
+    transform: translateY(-1px);
+}
+
+.atlas-tile.active {
+    border-color: var(--green);
+    background: var(--green-soft);
+    box-shadow: inset 0 0 0 1px rgba(126, 224, 74, 0.25);
+}
+
+.atlas-tile canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    image-rendering: pixelated;
+    background-color: #0d1020;
+    background-image:
+        linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+
+.atlas-tile-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 0 1px;
+    font-size: 8.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.atlas-tile-label strong {
+    color: var(--text);
+    font-size: 9px;
+    font-variant-numeric: tabular-nums;
+}
+
+.atlas-tile-label span {
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.atlas-tile.active .atlas-tile-label span {
+    color: var(--green);
+}
+
+.atlas-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.atlas-actions .btn.compact {
+    flex: 1 1 auto;
+    justify-content: center;
+    font-size: 10.5px;
+}
+
+/* ---------- Neighbour preview ---------- */
+
+.ds-neighbour-card .ds-card-head {
+    align-items: center;
+}
+
+.neighbour-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: auto;
+    background-color: #0d1020;
+    background-image:
+        linear-gradient(45deg, rgba(255, 255, 255, 0.035) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.035) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.035) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.035) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+#neighbour-preview {
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    height: auto;
+    image-rendering: pixelated;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--bg-0);
+    cursor: crosshair;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.3);
+}
+
+.neighbour-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+}
+
+.neighbour-toolbar .btn.compact {
+    flex: 0 0 auto;
+    padding: 6px 9px;
+    font-size: 10.5px;
+}
+
+.neighbour-toolbar .ds-check-hint {
+    flex: 1 1 190px;
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* ---------- Credits ---------- */
+
+.ds-footer-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.ds-footer-link:hover {
+    color: var(--green);
+}
+
+.credits-modal {
+    max-width: 620px;
+}
+
+.credits-subtitle {
+    margin: -4px 0 14px;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.credits-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 2px 2px 8px;
+}
+
+.credits-group h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+}
+
+.credits-group h3 i {
+    color: var(--green);
+}
+
+.credits-list {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.credits-list li {
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg-2);
+    font-size: 0.76rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.credits-list strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+}
+
+.credits-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.credits-tech span {
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+    .atlas-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .atlas-grid.mode-9 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .neighbour-toolbar .ds-check-hint {
+        display: none;
+    }
+}
