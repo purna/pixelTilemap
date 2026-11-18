@@ -17,11 +17,6 @@ const LayerManager = {
             this.addLayer();
         });
         
-        // Layers panel toggle
-        DOM.elements.layersBtn.addEventListener('click', () => {
-            State.setShowLayers(!State.showLayers);
-        });
-        
         // Layer list click handling
         DOM.elements.layersList.addEventListener('click', (e) => {
             this.handleLayerListClick(e);

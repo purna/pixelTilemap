@@ -167,6 +167,7 @@ const InputHandler = {
         const toolShortcuts = {
             'p': 'pencil',
             'b': 'brush',
+            's': 'spray',
             'e': 'eraser',
             'i': 'eyedropper'
         };
@@ -454,13 +455,6 @@ const InputHandler = {
             DOM.elements.zoomResetBtn.addEventListener('click', () => {
                 State.resetZoom();
                 ZoomManager.updateZoom();
-            });
-        }
-
-        // Layers panel toggle
-        if (DOM.elements.layersBtn) {
-            DOM.elements.layersBtn.addEventListener('click', () => {
-                State.setShowLayers(!State.showLayers);
             });
         }
 

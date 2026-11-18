@@ -30,13 +30,6 @@ const ToolManager = {
             }
         });
 
-        // Layers button click
-        if (DOM.elements.layersBtn) {
-            DOM.elements.layersBtn.addEventListener('click', () => {
-                this.showLayersPanel();
-            });
-        }
-
         // Brush size slider (right panel)
         if (DOM.elements.brushSizeSlider) {
             DOM.elements.brushSizeSlider.addEventListener('input', (e) => {
@@ -58,6 +51,29 @@ const ToolManager = {
                 if (typeof InputHandler !== 'undefined' && InputHandler.updatePresetOpacityButtons) {
                     InputHandler.updatePresetOpacityButtons(opacity);
                 }
+            });
+        }
+
+        // Spray-can controls
+        if (DOM.elements.sprayDensity) {
+            DOM.elements.sprayDensity.addEventListener('input', (e) => {
+                State.sprayDensity = parseInt(e.target.value, 10);
+                if (DOM.elements.sprayDensityDisplay) {
+                    DOM.elements.sprayDensityDisplay.textContent = State.sprayDensity;
+                }
+            });
+        }
+        if (DOM.elements.sprayOpacityVariation) {
+            DOM.elements.sprayOpacityVariation.addEventListener('input', (e) => {
+                State.sprayOpacityVariation = parseInt(e.target.value, 10) / 100;
+                if (DOM.elements.sprayOpacityVariationDisplay) {
+                    DOM.elements.sprayOpacityVariationDisplay.textContent = `${e.target.value}%`;
+                }
+            });
+        }
+        if (DOM.elements.sprayUsePalette) {
+            DOM.elements.sprayUsePalette.addEventListener('change', (e) => {
+                State.sprayUsePalette = e.target.checked;
             });
         }
 
@@ -90,13 +106,20 @@ const ToolManager = {
                         this.setTool('eraser');
                         e.preventDefault();
                         break;
+                    case 's':
+                        this.setTool('spray');
+                        e.preventDefault();
+                        break;
                     case 'i':
                         this.setTool('eyedropper');
                         e.preventDefault();
                         break;
                     case 'l':
-                        // Toggle layers panel
-                        this.showLayersPanel();
+                        // Show layers panel through the shared sidebar manager
+                        if (typeof UIManager !== 'undefined') {
+                            UIManager.showPanelSections(['panel-layers']);
+                            UIManager.setActiveSidebarButton('layersBtn');
+                        }
                         e.preventDefault();
                         break;
                 }
@@ -133,6 +156,8 @@ const ToolManager = {
         
         if (State.currentTool === 'pencil') {
             labelPanel.textContent = 'Pencil Size:';
+        } else if (State.currentTool === 'spray') {
+            labelPanel.textContent = 'Spray Size:';
         } else if (State.currentTool === 'eraser') {
             labelPanel.textContent = 'Eraser Size:';
         } else {
@@ -168,6 +193,29 @@ const ToolManager = {
         // Ensure UI and State are in sync for brush size
         if (State.brushSize !== undefined) {
             this.setBrushSize(State.brushSize);
+        }
+
+        // Stop a running spray timer when leaving the spray tool.
+        if (tool !== 'spray' && typeof TilemapCore !== 'undefined' && TilemapCore.stopSpray) {
+            TilemapCore.stopSpray();
+        }
+
+        // Spray-only options
+        const sprayOptions = document.getElementById('spray-options');
+        if (sprayOptions) {
+            sprayOptions.classList.toggle('hidden', tool !== 'spray');
+        }
+
+        // Selecting a drawing tool leaves the Layers/Canvas/Tilemap views.
+        // This also covers keyboard shortcuts, not just mouse clicks.
+        if (typeof State !== 'undefined') {
+            State.showLayers = false;
+        }
+        ['layersBtn', 'canvasBtn', 'settingsBtn', 'tilemapBtn'].forEach((id) => {
+            document.getElementById(id)?.classList.remove('active');
+        });
+        if (typeof UIManager !== 'undefined' && UIManager.updatePanelForTool) {
+            UIManager.updatePanelForTool(tool);
         }
     },
 
@@ -232,6 +280,17 @@ const ToolManager = {
                         style="background:var(--bg-light); border:1px solid var(--border-color); color:var(--text-primary); padding:2px 6px; border-radius:3px; cursor:pointer; font-size:10px; min-width:24px;">4</button>
                 `;
             }
+        } else if (tool === 'spray') {
+            // Spray can: wider working sizes
+            floatingContainer.innerHTML = `
+                <button class="preset-btn" data-size="1">3</button>
+                <button class="preset-btn" data-size="3">7</button>
+                <button class="preset-btn" data-size="5">11</button>
+                <button class="preset-btn" data-size="8">17</button>
+            `;
+            if (panelContainer) {
+                panelContainer.innerHTML = '';
+            }
         } else {
             // Brush tool: soft edges with alpha, sizes 1,3,7,11
             floatingContainer.innerHTML = `
@@ -290,6 +349,10 @@ const ToolManager = {
                 this.showPalettePanel();
                 this.showToolOptionsPanel(false); // Show both brush sizes and opacity
                 break;
+            case 'spray':
+                this.showPalettePanel();
+                this.showToolOptionsPanel(false);
+                break;
             case 'eraser':
                 this.showToolOptionsPanel(false); // Show brush sizes and opacity
                 break;
@@ -317,17 +380,6 @@ const ToolManager = {
 
     showPalettePanel() {
         const panel = document.getElementById('panel-palette');
-        if (panel) {
-            panel.classList.remove('hidden');
-        }
-    },
-
-    showLayersPanel() {
-        // Hide all other panels first
-        this.hideAllPanels();
-
-        // Show layers panel
-        const panel = document.getElementById('panel-layers');
         if (panel) {
             panel.classList.remove('hidden');
         }
@@ -395,6 +447,7 @@ const ToolManager = {
         return [
             { id: 'pencil', name: 'Pencil', icon: 'fas fa-pencil-alt', shortcut: 'P' },
             { id: 'brush', name: 'Brush', icon: 'fas fa-paint-brush', shortcut: 'B' },
+            { id: 'spray', name: 'Spray Can', icon: 'fas fa-spray-can', shortcut: 'S' },
             { id: 'eraser', name: 'Eraser', icon: 'fas fa-eraser', shortcut: 'E' },
             { id: 'eyedropper', name: 'Color Picker', icon: 'fas fa-eye-dropper', shortcut: 'I' }
         ];
@@ -405,6 +458,7 @@ const ToolManager = {
         const descriptions = {
             pencil: 'Draw with a single pixel at a time.',
             brush: 'Paint with the selected color. Left click to paint, right click to erase.',
+            spray: 'Spray dither particles over an area. Adjust size, density and opacity variation.',
             eraser: 'Remove pixels from the canvas. Left click to erase, right click to paint.',
             eyedropper: 'Pick a color from the canvas by clicking on it.'
         };
@@ -416,6 +470,7 @@ const ToolManager = {
         const icons = {
             pencil: 'fas fa-pencil-alt',
             brush: 'fas fa-paint-brush',
+            spray: 'fas fa-spray-can',
             eraser: 'fas fa-eraser',
             eyedropper: 'fas fa-eye-dropper'
         };

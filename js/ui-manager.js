@@ -96,27 +96,8 @@ const UIManager = {
             layersBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Toggle the layers panel visibility with animation
-                const layersPanel = document.getElementById('panel-layers');
-                if (layersPanel) {
-                    const isHidden = layersPanel.classList.contains('hidden');
-                    if (isHidden) {
-                        layersPanel.classList.remove('hidden');
-                        layersPanel.classList.add('slide-up');
-                    } else {
-                        layersPanel.classList.add('hidden');
-                        layersPanel.classList.remove('slide-up');
-                    }
-                }
+                this.showPanelSections(['panel-layers']);
                 this.setActiveSidebarButton('layersBtn');
-                // Also ensure the panel is open if we're showing layers
-                const panel = document.getElementById('side-panel');
-                if (panel && panel.classList.contains('closed')) {
-                    const toggleBtn = document.getElementById('panel-toggle');
-                    if (toggleBtn) {
-                        toggleBtn.click();
-                    }
-                }
             });
         }
 
@@ -126,27 +107,8 @@ const UIManager = {
             canvasBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Toggle the canvas panel visibility with animation
-                const canvasPanel = document.getElementById('panel-tool-canvas');
-                if (canvasPanel) {
-                    const isHidden = canvasPanel.classList.contains('hidden');
-                    if (isHidden) {
-                        canvasPanel.classList.remove('hidden');
-                        canvasPanel.classList.add('slide-up');
-                    } else {
-                        canvasPanel.classList.add('hidden');
-                        canvasPanel.classList.remove('slide-up');
-                    }
-                }
+                this.showPanelSections(['panel-tool-canvas']);
                 this.setActiveSidebarButton('canvasBtn');
-                // Also ensure the panel is open if we're showing canvas
-                const panel = document.getElementById('side-panel');
-                if (panel && panel.classList.contains('closed')) {
-                    const toggleBtn = document.getElementById('panel-toggle');
-                    if (toggleBtn) {
-                        toggleBtn.click();
-                    }
-                }
             });
         }
 
@@ -156,27 +118,8 @@ const UIManager = {
             tilemapBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Toggle the tilemap panel visibility with animation
-                const tilemapPanel = document.getElementById('panel-tilemap');
-                if (tilemapPanel) {
-                    const isHidden = tilemapPanel.classList.contains('hidden');
-                    if (isHidden) {
-                        tilemapPanel.classList.remove('hidden');
-                        tilemapPanel.classList.add('slide-up');
-                    } else {
-                        tilemapPanel.classList.add('hidden');
-                        tilemapPanel.classList.remove('slide-up');
-                    }
-                }
+                this.showPanelSections(['panel-tilemap']);
                 this.setActiveSidebarButton('tilemapBtn');
-                // Also ensure the panel is open if we're showing tilemap
-                const panel = document.getElementById('side-panel');
-                if (panel && panel.classList.contains('closed')) {
-                    const toggleBtn = document.getElementById('panel-toggle');
-                    if (toggleBtn) {
-                        toggleBtn.click();
-                    }
-                }
             });
         }
     },
@@ -302,6 +245,7 @@ const UIManager = {
         switch (toolName) {
             case 'pencil':
             case 'brush':
+            case 'spray':
             case 'bucket':
             case 'dither':
             case 'stroke':
@@ -357,6 +301,11 @@ const UIManager = {
                 }
             }
         });
+
+        // Keep state in sync so later UI refreshes do not re-hide the panel.
+        if (typeof State !== 'undefined') {
+            State.showLayers = idsToShow.includes('panel-layers');
+        }
 
         // Ensure panel is open if the user clicks a specific view
         const panel = document.getElementById('side-panel');

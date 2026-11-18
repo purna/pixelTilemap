@@ -96,6 +96,13 @@ const PaletteManager = {
             const rect = element.getBoundingClientRect();
             offsetX = event.clientX - rect.left;
             offsetY = event.clientY - rect.top;
+            // Once dragged, anchor the panel by top/left only. Leaving the
+            // CSS bottom value in place makes top+bottom stretch the panel
+            // taller as it moves up the screen.
+            element.style.left = `${rect.left}px`;
+            element.style.top = `${rect.top}px`;
+            element.style.bottom = 'auto';
+            element.style.height = 'auto';
             element.style.transform = 'none';
             element.style.cursor = 'grabbing';
             event.preventDefault();
@@ -119,9 +126,12 @@ const PaletteManager = {
 
         element.addEventListener('dblclick', (event) => {
             if (event.target.closest('.color-swatch')) return;
-            element.style.left = '140px';
-            element.style.top = '50%';
-            element.style.transform = 'translateY(-50%)';
+            // Clear the drag offsets so the panel returns to its CSS dock.
+            element.style.left = '';
+            element.style.top = '';
+            element.style.bottom = '';
+            element.style.height = '';
+            element.style.transform = '';
         });
     },
 

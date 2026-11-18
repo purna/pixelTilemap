@@ -7,6 +7,9 @@ const State = {
     currentColor: '#282828',
     brushSize: 0,  // 1x1 brush for pencil tool
     opacity: 1.0,
+    sprayDensity: 14,
+    sprayOpacityVariation: 0.5,
+    sprayUsePalette: false,
     
     // Canvas state
     isDrawing: false,
@@ -352,6 +355,22 @@ const State = {
         const opacityDisplay = document.getElementById('opacityDisplay');
         if (opacitySlider) opacitySlider.value = this.opacity * 100;
         if (opacityDisplay) opacityDisplay.textContent = `${Math.round(this.opacity * 100)}%`;
+
+        // Spray-can options
+        const sprayDensity = document.getElementById('sprayDensity');
+        const sprayDensityDisplay = document.getElementById('sprayDensityDisplay');
+        if (sprayDensity) sprayDensity.value = this.sprayDensity;
+        if (sprayDensityDisplay) sprayDensityDisplay.textContent = this.sprayDensity;
+
+        const sprayOpacityVariation = document.getElementById('sprayOpacityVariation');
+        const sprayOpacityVariationDisplay = document.getElementById('sprayOpacityVariationDisplay');
+        if (sprayOpacityVariation) sprayOpacityVariation.value = this.sprayOpacityVariation * 100;
+        if (sprayOpacityVariationDisplay) {
+            sprayOpacityVariationDisplay.textContent = `${Math.round(this.sprayOpacityVariation * 100)}%`;
+        }
+
+        const sprayUsePalette = document.getElementById('sprayUsePalette');
+        if (sprayUsePalette) sprayUsePalette.checked = this.sprayUsePalette;
         
         // Update panel visibility
         const layersPanel = document.getElementById('panel-layers');

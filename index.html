@@ -114,6 +114,10 @@
                             data-tooltip="**Brush Tool**\n--Smooth painting--\nShortcut: B">
                             <i class="fas fa-paint-brush"></i><span>Brush</span>
                         </button>
+                        <button class="tool-btn ds-tool" data-tool="spray" title="Spray Can (S)"
+                            data-tooltip="**Spray Can**\n--Dither colour over an area--\nShortcut: S\n\n• Size and density\n• Random opacity variation\n• Optional palette dithering">
+                            <i class="fas fa-spray-can"></i><span>Spray</span>
+                        </button>
                         <button class="tool-btn ds-tool" data-tool="eraser" title="Eraser (E)"
                             data-tooltip="**Eraser Tool**\n--Remove pixels--\nShortcut: E">
                             <i class="fas fa-eraser"></i><span>Eraser</span>
@@ -278,6 +282,26 @@
                         <button class="preset-btn opacity-btn" data-opacity="0.5">50%</button>
                         <button class="preset-btn opacity-btn" data-opacity="0.75">75%</button>
                         <button class="preset-btn opacity-btn active" data-opacity="1">100%</button>
+                    </div>
+
+                    <div id="spray-options" class="ds-field hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line-soft);">
+                        <div class="ds-row ds-between">
+                            <label class="ds-label" for="sprayDensity">Density</label>
+                            <span id="sprayDensityDisplay" class="ds-pill">14</span>
+                        </div>
+                        <input type="range" id="sprayDensity" class="ds-range" min="1" max="60" value="14" aria-label="Spray density">
+
+                        <div class="ds-row ds-between" style="margin-top:12px;">
+                            <label class="ds-label" for="sprayOpacityVariation">Opacity variation</label>
+                            <span id="sprayOpacityVariationDisplay" class="ds-pill">50%</span>
+                        </div>
+                        <input type="range" id="sprayOpacityVariation" class="ds-range" min="0" max="100" value="50" aria-label="Spray opacity variation">
+
+                        <label class="ds-check-row" for="sprayUsePalette">
+                            <input type="checkbox" id="sprayUsePalette">
+                            <span>Dither with palette colours</span>
+                        </label>
+                        <p class="ds-check-hint">Spray uses the current colour, or a mix of palette colours when enabled.</p>
                     </div>
                 </section>
 
@@ -719,9 +743,9 @@
 
     <!-- Specialized modules -->
     <script src="js/tilemap-core.js?v=7"></script>
-    <script src="js/palette-manager.js?v=6"></script>
-    <script src="js/layer-manager.js?v=7"></script>
-    <script src="js/tool-manager.js?v=7"></script>
+    <script src="js/palette-manager.js?v=8"></script>
+    <script src="js/layer-manager.js?v=8"></script>
+    <script src="js/tool-manager.js?v=9"></script>
     <script src="js/file-manager.js?v=7"></script>
     <script src="js/terrain-grid.js?v=8"></script>
     <script src="js/tilemap-manager.js?v=6"></script>
@@ -732,8 +756,8 @@
     <script src="js/tutorialSystem.js"></script>
 
     <!-- Input handling -->
-    <script src="js/input-handler.js?v=7"></script>
-    <script src="js/ui-manager.js?v=6"></script>
+    <script src="js/input-handler.js?v=8"></script>
+    <script src="js/ui-manager.js?v=7"></script>
 
     <!-- Main application -->
     <script src="js/app.js?v=6"></script>

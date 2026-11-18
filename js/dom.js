@@ -75,6 +75,12 @@ const DOM = {
             colorHex: document.getElementById('colorHex'),
             opacitySlider: document.getElementById('opacitySlider'),
             opacityDisplay: document.getElementById('opacityDisplay'),
+            sprayOptions: document.getElementById('spray-options'),
+            sprayDensity: document.getElementById('sprayDensity'),
+            sprayDensityDisplay: document.getElementById('sprayDensityDisplay'),
+            sprayOpacityVariation: document.getElementById('sprayOpacityVariation'),
+            sprayOpacityVariationDisplay: document.getElementById('sprayOpacityVariationDisplay'),
+            sprayUsePalette: document.getElementById('sprayUsePalette'),
 
             // Tool buttons
             toolButtons: document.querySelectorAll('.tool-btn'),
