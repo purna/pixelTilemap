@@ -123,11 +123,22 @@ const TerrainGrid = {
         if (!confirm('Load the centre tile of this terrain sample into the canvas? The current canvas will be replaced.')) return;
 
         // The app edits one seamless tile, not a 3×3 map. Load only the centre
-        // cell so the terrain sample is not squeezed into a single tile.
+        // cell, and resample it to the canvas's logical resolution so the
+        // loaded art has exactly the same pixel dimensions as the tile.
+        const logicalSize = Math.max(1, Config.TILE_DIM || 32);
+
+        const sampleCanvas = document.createElement('canvas');
+        sampleCanvas.width = this.TILE;
+        sampleCanvas.height = this.TILE;
+        this.drawTile(sampleCanvas.getContext('2d'), 1, 1);
+
         const tileCanvas = document.createElement('canvas');
-        tileCanvas.width = this.TILE;
-        tileCanvas.height = this.TILE;
-        this.drawTile(tileCanvas.getContext('2d'), 1, 1);
+        tileCanvas.width = logicalSize;
+        tileCanvas.height = logicalSize;
+        const tileCtx = tileCanvas.getContext('2d');
+        tileCtx.imageSmoothingEnabled = true;
+        tileCtx.imageSmoothingQuality = 'high';
+        tileCtx.drawImage(sampleCanvas, 0, 0, logicalSize, logicalSize);
 
         // Clear every layer so the sample is shown by itself, then paint it
         // on the active layer.
@@ -291,10 +302,11 @@ const TerrainGrid = {
     bandColor(worldX, worldY, band) {
         const noise = this.hash(worldX * 0.7, worldY * 0.7);
         if (band < 2.2) return noise > 0.55 ? '#a8e63a' : '#8bcf2e';
-        if (band < 4.2) return noise > 0.6 ? '#93613f' : '#7d4e33';
-        if (noise > 0.82) return '#8c5a39';
-        if (noise < 0.1) return '#5f3924';
-        return '#71442d';
+        // Use the same brown palette as the filled dirt tiles so the grass/dirt
+        // transition reads as one material rather than a dark outline.
+        if (noise > 0.86) return '#d29a5f';
+        if (noise < 0.09) return '#b07845';
+        return '#c68b52';
     },
 
     grassColor(worldX, worldY) {

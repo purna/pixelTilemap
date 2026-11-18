@@ -56,6 +56,10 @@ const LayerManager = {
             layerCtx.drawImage(DOM.editorCanvas, 0, 0);
         }
         this.renderLayers();
+        // Seed undo history with the starting artwork so the first stroke is undoable.
+        if (typeof State !== 'undefined' && typeof State.resetHistory === 'function') {
+            State.resetHistory();
+        }
     },
     
     addLayer(name = null) {
@@ -514,7 +518,10 @@ const LayerManager = {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
-                    layer.canvas.getContext('2d').drawImage(img, 0, 0);
+                    const ctx = layer.canvas.getContext('2d');
+                    ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+                    ctx.imageSmoothingEnabled = false;
+                    ctx.drawImage(img, 0, 0, layer.canvas.width, layer.canvas.height);
                     if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
                     resolve();
                 };
@@ -531,6 +538,10 @@ const LayerManager = {
         return Promise.all(imageLoads).then(() => {
             this.renderLayers();
             if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+            // Reset history after loading so undo starts from the loaded project.
+            if (typeof State !== 'undefined' && typeof State.resetHistory === 'function') {
+                State.resetHistory();
+            }
         });
     }
 };

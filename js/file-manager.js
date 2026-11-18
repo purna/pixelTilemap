@@ -370,6 +370,8 @@ const FileManager = {
     
     updateHistoryButtons() {
         // Enable/disable undo/redo buttons based on history state
+        if (!DOM.elements || !DOM.elements.undoBtn || !DOM.elements.redoBtn) return;
+
         DOM.elements.undoBtn.disabled = State.historyIndex <= 0;
         DOM.elements.redoBtn.disabled = State.historyIndex >= State.history.length - 1;
         

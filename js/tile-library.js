@@ -239,8 +239,12 @@ const TileLibrary = {
         if (State.layers.length === 0) State.addLayer('Layer 1');
 
         State.activeLayerIndex = 0;
-        State.history = [];
-        State.historyIndex = -1;
+        if (typeof State.resetHistory === 'function') {
+            State.resetHistory();
+        } else {
+            State.history = [];
+            State.historyIndex = -1;
+        }
         this.currentTileId = null;
         this.persist();
 

@@ -187,7 +187,11 @@ const TilemapCore = {
     },
     
     stopDrawing() {
+        if (!State.isDrawing) return;
         State.setDrawing(false);
+        // TilemapCore owns the stroke lifecycle, so this is where a completed
+        // paint stroke becomes an undoable history entry.
+        State.saveState();
     },
     
     updatePreviews() {

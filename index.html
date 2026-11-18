@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="css/settings.css?v=6">
     <link rel="stylesheet" href="css/tutorials.css">
     <!-- Studio layout + design layer (loads last) -->
-    <link rel="stylesheet" href="css/studio.css?v=3">
+    <link rel="stylesheet" href="css/studio.css?v=4">
     <!-- Custom Fonts -->
     <style>
         @font-face {
@@ -183,8 +183,8 @@
                 <section class="ds-section ds-panel-foot">
                     <div class="ds-hint ds-small-hint">
                         <i class="fas fa-circle-info"></i>
-                        Draw across the nine tiles — the centre tile is the one you edit and the surrounding
-                        eight repeat it seamlessly.
+                        Paint the centre tile — half of each surrounding repeat is shown so you can
+                        check that the tile joins seamlessly.
                     </div>
                 </section>
             </aside>
@@ -196,39 +196,46 @@
                         <div class="ds-card-head">
                             <div>
                                 <h2><i class="fas fa-paintbrush"></i> Tile Editor</h2>
-                                <p class="ds-subtitle">Drag across the 9 tiles — the centre tile is the one you edit.</p>
+                                <p class="ds-subtitle">The centre tile is editable; half of each neighbouring repeat is shown.</p>
                             </div>
                             <div class="ds-badges">
                                 <span id="canvasBadge" class="ds-badge">32 × 32 px</span>
                                 <span id="zoomBadge" class="ds-badge">1.0×</span>
+                                <label class="center-guide-switch" title="Show or hide the guide around the centre tile">
+                                    <input type="checkbox" id="centerGuideToggle" checked>
+                                    <span>Centre line</span>
+                                </label>
                             </div>
                         </div>
 
                         <div class="ds-editor-stage">
                             <div class="tile-grid-container">
-                                <div class="tile-grid">
-                                    <!-- The 3x3 canvas grid -->
-                                    <!-- Row 1 -->
-                                    <canvas id="preview-0-0" width="512" height="512"></canvas>
-                                    <canvas id="preview-0-1" width="512" height="512"></canvas>
-                                    <canvas id="preview-0-2" width="512" height="512"></canvas>
-                                    <!-- Row 2 -->
-                                    <canvas id="preview-1-0" width="512" height="512"></canvas>
-                                    <canvas id="editor-canvas" width="512" height="512"></canvas>
-                                    <canvas id="preview-1-2" width="512" height="512"></canvas>
-                                    <!-- Row 3 -->
-                                    <canvas id="preview-2-0" width="512" height="512"></canvas>
-                                    <canvas id="preview-2-1" width="512" height="512"></canvas>
-                                    <canvas id="preview-2-2" width="512" height="512"></canvas>
+                                <div class="tile-grid" id="mainTileGrid">
+                                    <!-- Selected tile plus 50% of each neighbouring repeat -->
+                                    <!-- Row 1: bottom half / bottom-left quarter / bottom-right quarter -->
+                                    <div class="tile-cell cell-nw"><canvas id="preview-0-0" width="512" height="512"></canvas></div>
+                                    <div class="tile-cell cell-n"><canvas id="preview-0-1" width="512" height="512"></canvas></div>
+                                    <div class="tile-cell cell-ne"><canvas id="preview-0-2" width="512" height="512"></canvas></div>
+                                    <!-- Row 2: right half / selected tile / left half -->
+                                    <div class="tile-cell cell-w"><canvas id="preview-1-0" width="512" height="512"></canvas></div>
+                                    <div class="tile-cell cell-center">
+                                        <canvas id="editor-canvas" width="512" height="512"></canvas>
+                                        <span class="center-guide" aria-hidden="true"></span>
+                                    </div>
+                                    <div class="tile-cell cell-e"><canvas id="preview-1-2" width="512" height="512"></canvas></div>
+                                    <!-- Row 3: top-right quarter / top half / top-left quarter -->
+                                    <div class="tile-cell cell-sw"><canvas id="preview-2-0" width="512" height="512"></canvas></div>
+                                    <div class="tile-cell cell-s"><canvas id="preview-2-1" width="512" height="512"></canvas></div>
+                                    <div class="tile-cell cell-se"><canvas id="preview-2-2" width="512" height="512"></canvas></div>
                                 </div>
                             </div>
                         </div>
 
                         <div id="info-box" class="info-box ds-hint">
                             <i class="fas fa-circle-info"></i>
-                            <p><strong>Instructions:</strong> Drag seamlessly across the 9 tiles to edit the central
-                                tile. Drawing only stops when you release the mouse button or lift your finger. Use the
-                                toolbar on the left to switch between brush and eraser tools.</p>
+                            <p><strong>Instructions:</strong> Paint on the centre tile or drag into the half-tile border to
+                                check seams. Use <strong>Centre line</strong> to show or hide the guide around the selected
+                                tile. Drawing only stops when you release the mouse button or lift your finger.</p>
                         </div>
                     </section>
                 </div>
@@ -721,7 +728,7 @@
 
     <!-- Core modules -->
     <script src="js/config.js?v=6"></script>
-    <script src="js/state.js?v=7"></script>
+    <script src="js/state.js?v=8"></script>
     <script src="js/dom.js?v=6"></script>
     <script src="js/notifications.js"></script>
 
@@ -729,15 +736,15 @@
     <script src="js/tooltip.js?v=6"></script>
 
     <!-- Specialized modules -->
-    <script src="js/tilemap-core.js?v=6"></script>
+    <script src="js/tilemap-core.js?v=7"></script>
     <script src="js/palette-manager.js?v=6"></script>
-    <script src="js/layer-manager.js?v=6"></script>
+    <script src="js/layer-manager.js?v=7"></script>
     <script src="js/tool-manager.js?v=6"></script>
-    <script src="js/file-manager.js?v=6"></script>
-    <script src="js/terrain-grid.js?v=7"></script>
+    <script src="js/file-manager.js?v=7"></script>
+    <script src="js/terrain-grid.js?v=8"></script>
     <script src="js/tilemap-manager.js?v=6"></script>
-    <script src="js/tile-library.js?v=6"></script>
-    <script src="js/settings-manager.js?v=8"></script>
+    <script src="js/tile-library.js?v=7"></script>
+    <script src="js/settings-manager.js?v=9"></script>
     <script src="js/zoom-manager.js?v=7"></script>
     <script src="js/tutorialConfig.js"></script>
     <script src="js/tutorialSystem.js"></script>

@@ -69,6 +69,7 @@ const SettingsManager = {
         // Bind the always-visible Canvas Options panel here so it works whether
         // the DOM was already ready or we waited for DOMContentLoaded.
         this.setupPanelCanvasControls();
+        this.setupCenterGuideToggle();
 
         // Settings button click
         const settingsBtn = document.getElementById('settingsBtn');
@@ -84,6 +85,37 @@ const SettingsManager = {
         } else {
             console.error('Settings button not found!');
         }
+    },
+
+    /**
+     * Show/hide the hard guide around the centre tile. The guide marks the
+     * exact tile boundary against the 50% neighbour preview.
+     */
+    setupCenterGuideToggle() {
+        const toggle = document.getElementById('centerGuideToggle');
+        const grid = document.getElementById('mainTileGrid');
+        if (!toggle || !grid || toggle.dataset.bound === 'true') return;
+
+        toggle.dataset.bound = 'true';
+
+        let visible = true;
+        try {
+            visible = localStorage.getItem('tilemap-center-guide') !== 'false';
+        } catch (error) {
+            // Storage is optional; keep the guide visible.
+        }
+
+        toggle.checked = visible;
+        grid.classList.toggle('hide-center-guide', !visible);
+
+        toggle.addEventListener('change', () => {
+            grid.classList.toggle('hide-center-guide', !toggle.checked);
+            try {
+                localStorage.setItem('tilemap-center-guide', String(toggle.checked));
+            } catch (error) {
+                // Ignore storage failures.
+            }
+        });
     },
 
     /**

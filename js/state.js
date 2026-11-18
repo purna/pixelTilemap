@@ -208,11 +208,29 @@ const State = {
     },
     
     saveState() {
-        // Implementation for undo/redo functionality
+        // Capture the current drawing state for undo/redo.
         const state = this.captureCurrentState();
         this.history = this.history.slice(0, this.historyIndex + 1);
         this.history.push(state);
         this.historyIndex = this.history.length - 1;
+        this.notifyHistoryChanged();
+    },
+
+    /**
+     * Start a fresh history with the current artwork as the baseline. This is
+     * called after the initial layer, a project load, or clearing the canvas so
+     * the very first paint stroke can be undone.
+     */
+    resetHistory() {
+        this.history = [];
+        this.historyIndex = -1;
+        this.saveState();
+    },
+
+    notifyHistoryChanged() {
+        if (typeof FileManager !== 'undefined' && typeof FileManager.updateHistoryButtons === 'function') {
+            FileManager.updateHistoryButtons();
+        }
     },
     
     undo() {
@@ -220,6 +238,7 @@ const State = {
             this.historyIndex--;
             this.restoreState(this.history[this.historyIndex]);
             this.updateUI();
+            this.notifyHistoryChanged();
         }
     },
     
@@ -228,11 +247,13 @@ const State = {
             this.historyIndex++;
             this.restoreState(this.history[this.historyIndex]);
             this.updateUI();
+            this.notifyHistoryChanged();
         }
     },
     
     captureCurrentState() {
-        // Capture current drawing state for undo/redo
+        // Capture current drawing state for undo/redo. The canvas is stored as
+        // a data URL so each history entry stays reasonably compact.
         return {
             layers: this.layers.map(layer => ({
                 ...layer,
@@ -243,22 +264,46 @@ const State = {
     },
     
     restoreState(state) {
-        // Restore drawing state from undo/redo
+        // Recreate layer canvases at the current resolution and paint the
+        // saved data URLs into them. The old implementation assigned the new
+        // canvas element to img.src, so the image never loaded and undo did
+        // nothing for painting.
         this.layers = state.layers.map(layerData => ({
             ...layerData,
             canvas: this.createLayerCanvas()
         }));
-        
-        // Restore canvas data
-        this.layers.forEach((layer, index) => {
-            const img = new Image();
-            img.onload = () => {
-                layer.canvas.getContext('2d').drawImage(img, 0, 0);
-            };
-            img.src = layer.canvas;
+
+        this.activeLayerIndex = Math.min(
+            Math.max(0, state.activeLayerIndex || 0),
+            Math.max(0, this.layers.length - 1)
+        );
+
+        const imageLoads = this.layers.map((layer, index) => {
+            const dataUrl = state.layers[index] && state.layers[index].canvas;
+            if (!dataUrl) return Promise.resolve();
+
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const ctx = layer.canvas.getContext('2d');
+                    ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+                    ctx.imageSmoothingEnabled = false;
+                    ctx.drawImage(img, 0, 0, layer.canvas.width, layer.canvas.height);
+                    resolve();
+                };
+                img.onerror = () => resolve();
+                img.src = dataUrl;
+            });
         });
-        
-        this.activeLayerIndex = state.activeLayerIndex;
+
+        if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
+        this.notifyHistoryChanged();
+
+        return Promise.all(imageLoads).then(() => {
+            if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
+            if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+            this.updateUI();
+        });
     },
     
     hexToRgb(hex) {
