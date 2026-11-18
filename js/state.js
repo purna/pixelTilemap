@@ -212,6 +212,8 @@ const State = {
         const state = this.captureCurrentState();
         this.history = this.history.slice(0, this.historyIndex + 1);
         this.history.push(state);
+        // Keep undo memory bounded; large tiles store a data URL per entry.
+        if (this.history.length > 40) this.history.shift();
         this.historyIndex = this.history.length - 1;
         this.notifyHistoryChanged();
     },
@@ -237,6 +239,7 @@ const State = {
         if (this.historyIndex > 0) {
             this.historyIndex--;
             this.restoreState(this.history[this.historyIndex]);
+            this.markUnsaved();
             this.updateUI();
             this.notifyHistoryChanged();
         }
@@ -246,6 +249,7 @@ const State = {
         if (this.historyIndex < this.history.length - 1) {
             this.historyIndex++;
             this.restoreState(this.history[this.historyIndex]);
+            this.markUnsaved();
             this.updateUI();
             this.notifyHistoryChanged();
         }

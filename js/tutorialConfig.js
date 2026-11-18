@@ -28,7 +28,7 @@ class TutorialConfig {
                         arrowPositionOverride: 'center',
                         marginOverride: '0',
                         heading: 'Welcome to Seamless Tilemap Editor Pro!',
-                        content: 'This tutorial will guide you through creating seamless tile patterns. The 3x3 grid allows you to draw patterns that repeat perfectly.',
+                        content: 'This tutorial will guide you through creating seamless tile patterns. The centre tile is editable, with half of each neighbouring repeat shown around it.',
                         showNext: true,
                         showSkip: true
                     },
@@ -51,7 +51,7 @@ class TutorialConfig {
                         arrowPosition: 'none',
                         marginOverride: '10px',
                         heading: 'Seamless Drawing Technique',
-                        content: 'Click and drag across the 9 tiles to create seamless patterns. Your drawing will automatically wrap around the edges to create perfect repeating tiles.',
+                        content: 'Paint on the centre tile or drag into the half-tile border. Your drawing wraps around the edges automatically to create a perfect repeating tile.',
                         showNext: true,
                         showSkip: true
                     },
