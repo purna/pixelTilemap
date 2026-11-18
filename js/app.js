@@ -45,6 +45,7 @@ const App = {
 
         // Initialize core functionality
         TilemapCore.init();
+        if (typeof TerrainGrid !== 'undefined') TerrainGrid.init();
 
         // Initialize managers
         PaletteManager.init();
