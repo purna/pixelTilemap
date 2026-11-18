@@ -1371,13 +1371,13 @@ input[type="range"].ds-range,
 }
 
 #panel-tilemap .tilemap-square.active:not(.center) {
-    border-color: var(--green) !important;
-    box-shadow: 0 0 0 1px rgba(126, 224, 74, 0.4) !important;
+    border-color: rgba(126, 224, 74, 0.55) !important;
+    box-shadow: none !important;
 }
 
 #panel-tilemap .tilemap-square.center {
-    border-color: var(--cyan) !important;
-    box-shadow: 0 0 0 1px rgba(67, 217, 255, 0.25) !important;
+    border-color: rgba(67, 217, 255, 0.65) !important;
+    box-shadow: none !important;
 }
 
 .tilemap-info {
