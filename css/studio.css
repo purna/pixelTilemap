@@ -44,7 +44,7 @@
 
     /* On-screen size of one tile. This is deliberately independent of the
        internal canvas resolution so 32 px and 128 px tiles both stay readable. */
-    --canvas-size: clamp(110px, calc((100vw - 660px) / 3), 320px);
+    --canvas-size: clamp(110px, min(calc((100vw - 660px) / 3), calc((100vh - 300px) / 3)), 320px);
 }
 
 * {

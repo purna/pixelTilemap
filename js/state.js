@@ -296,7 +296,7 @@ const State = {
         const brushSize = document.getElementById('brush-size');
         const brushSizeValue = document.getElementById('brush-size-value');
         if (brushSize) brushSize.value = this.brushSize;
-        if (brushSizeValue) brushSizeValue.textContent = `${(this.brushSize)}`;
+        if (brushSizeValue) brushSizeValue.textContent = `${this.brushSize * 2 + 1} px`;
         
         // Update opacity controls
         const opacitySlider = document.getElementById('opacitySlider');

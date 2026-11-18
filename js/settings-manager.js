@@ -887,4 +887,6 @@ const SettingsManager = {
     }
 };
 
-SettingsManager.init();
+// Initialisation is orchestrated by App.init() after DOM.init() has created
+// the layer canvases. Self-initialising here ran before the canvas grid was
+// ready, which made canvas-size changes apply to Config but not to the DOM.
