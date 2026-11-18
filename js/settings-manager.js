@@ -32,6 +32,10 @@ const SettingsManager = {
             };
         }
 
+        // The right-panel canvas controls must exist before the settings
+        // modal is ever opened, so bind them during init rather than lazily.
+        this.setupPanelCanvasControls();
+
         // Ensure DOM is ready before setting up event listeners
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
@@ -77,6 +81,84 @@ const SettingsManager = {
         } else {
             console.error('Settings button not found!');
         }
+    },
+
+    /**
+     * Bind the always-visible Canvas Options panel (right sidebar).
+     * These controls used to be bound lazily when the Settings modal opened,
+     * which meant the Apply button silently did nothing on first use.
+     */
+    setupPanelCanvasControls() {
+        const applyBtn = document.getElementById('apply-canvas-resize');
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+
+        if (applyBtn && widthInput && heightInput && !applyBtn.dataset.settingsBound) {
+            applyBtn.dataset.settingsBound = 'true';
+            applyBtn.addEventListener('click', () => {
+                const width = parseInt(widthInput.value, 10);
+                const height = parseInt(heightInput.value, 10) || width;
+                if (this.resizeCanvas(width, height)) {
+                    if (typeof Notifications !== 'undefined') {
+                        new Notifications().success(`Canvas resized to ${width}×${height}`);
+                    }
+                }
+            });
+        }
+
+        // Keep the editor square: height follows width unless a preset sets it.
+        if (widthInput && heightInput && !widthInput.dataset.canvasSyncBound) {
+            widthInput.dataset.canvasSyncBound = 'true';
+            widthInput.addEventListener('input', () => {
+                heightInput.value = widthInput.value;
+                this.updateCanvasPresetState();
+            });
+        }
+
+        // Common tile sizes applied immediately with one click.
+        const presetWrap = document.getElementById('canvasPresets');
+        if (presetWrap && !presetWrap.dataset.settingsBound) {
+            presetWrap.dataset.settingsBound = 'true';
+            presetWrap.addEventListener('click', (e) => {
+                const button = e.target.closest('[data-size]');
+                if (!button) return;
+                const size = parseInt(button.dataset.size, 10);
+                if (!Number.isFinite(size)) return;
+                if (widthInput) widthInput.value = size;
+                if (heightInput) heightInput.value = size;
+                if (this.resizeCanvas(size, size)) {
+                    if (typeof Notifications !== 'undefined') {
+                        new Notifications().success(`Canvas set to ${size}×${size}`);
+                    }
+                }
+            });
+        }
+
+        this.syncPanelCanvasInputs();
+    },
+
+    /** Keep the sidebar inputs and preset highlight in sync with Config. */
+    syncPanelCanvasInputs() {
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        if (widthInput) widthInput.value = Config.TILE_DIM;
+        if (heightInput) heightInput.value = Config.TILE_DIM;
+
+        // Mirror into the settings modal default-size fields so both views agree.
+        const defaultWidth = document.getElementById('setting-default-canvas-width');
+        const defaultHeight = document.getElementById('setting-default-canvas-height');
+        if (defaultWidth) defaultWidth.value = Config.TILE_DIM;
+        if (defaultHeight) defaultHeight.value = Config.TILE_DIM;
+
+        this.updateCanvasPresetState();
+    },
+
+    updateCanvasPresetState() {
+        const presetWrap = document.getElementById('canvasPresets');
+        if (!presetWrap) return;
+        presetWrap.querySelectorAll('[data-size]').forEach(button => {
+            button.classList.toggle('active', parseInt(button.dataset.size, 10) === Config.TILE_DIM);
+        });
     },
 
     toggleSettings() {
@@ -349,22 +431,8 @@ const SettingsManager = {
             });
         }
 
-        // Right-panel canvas resize button
-        const panelResizeBtn = document.getElementById('apply-canvas-resize');
-        const panelWidth = document.getElementById('widthInput');
-        const panelHeight = document.getElementById('heightInput');
-        if (panelResizeBtn && panelWidth && panelHeight && !panelResizeBtn.dataset.settingsBound) {
-            panelResizeBtn.dataset.settingsBound = 'true';
-            panelResizeBtn.addEventListener('click', () => {
-                const width = parseInt(panelWidth.value, 10);
-                const height = parseInt(panelHeight.value, 10);
-                if (this.resizeCanvas(width, height)) {
-                    if (typeof Notifications !== 'undefined') {
-                        new Notifications().success(`Canvas resized to ${width}×${height}`);
-                    }
-                }
-            });
-        }
+        // Right-panel canvas controls are bound in setupPanelCanvasControls()
+        // during init, so the Apply button works without opening this modal.
 
         // Width slider event listener
         const widthSlider = document.getElementById('canvasWidth');
@@ -575,8 +643,9 @@ const SettingsManager = {
         Config.TILE_DIM = width;
         Config.CANVAS_SIZE = newCanvasSize;
 
-        // Keep the visual canvas grid in sync with the logical resolution.
-        document.documentElement.style.setProperty('--canvas-size', `${newCanvasSize}px`);
+        // NOTE: --canvas-size is the on-screen display size, not the internal
+        // buffer size. Leaving it fixed keeps a 32×32 tile readable on screen
+        // and prevents a 128×128 tile from becoming thousands of CSS pixels.
 
         // Resize all canvas elements
         if (typeof DOM !== 'undefined' && DOM.allCanvases) {
@@ -592,6 +661,7 @@ const SettingsManager = {
         if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
         if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
         if (typeof State !== 'undefined' && State.updateUI) State.updateUI();
+        this.syncPanelCanvasInputs();
 
         console.log(`Canvas resized to ${width}×${height} (${newCanvasSize}px)`);
         return true;

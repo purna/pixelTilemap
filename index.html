@@ -301,7 +301,7 @@
                                 placeholder="Width" class="size-input" aria-label="Canvas width">
                             <span class="size-separator">×</span>
                             <input type="number" id="heightInput" value="32" min="4" max="512"
-                                placeholder="Height" class="size-input" aria-label="Canvas height">
+                                placeholder="Height" class="size-input" aria-label="Canvas height" readonly title="Tiles are square — height follows width">
                         </div>
                         <button id="apply-canvas-resize" class="btn btn-apply-size" title="Apply Canvas Resize">
                             <i class="fas fa-expand-arrows-alt"></i>
@@ -310,6 +310,20 @@
                     </div>
                     <div class="size-description">
                         Set the canvas dimensions (4-512 pixels)
+                    </div>
+                    <div class="canvas-presets" id="canvasPresets" role="group" aria-label="Common tile sizes">
+                        <span class="ds-label">Common tile sizes</span>
+                        <div class="canvas-preset-grid">
+                            <button type="button" class="canvas-preset" data-size="8">8<small>px</small></button>
+                            <button type="button" class="canvas-preset" data-size="16">16<small>px</small></button>
+                            <button type="button" class="canvas-preset" data-size="24">24<small>px</small></button>
+                            <button type="button" class="canvas-preset active" data-size="32">32<small>px</small></button>
+                            <button type="button" class="canvas-preset" data-size="48">48<small>px</small></button>
+                            <button type="button" class="canvas-preset" data-size="64">64<small>px</small></button>
+                            <button type="button" class="canvas-preset" data-size="96">96<small>px</small></button>
+                            <button type="button" class="canvas-preset" data-size="128">128<small>px</small></button>
+                            <button type="button" class="canvas-preset" data-size="256">256<small>px</small></button>
+                        </div>
                     </div>
                 </section>
 
