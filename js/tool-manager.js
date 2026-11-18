@@ -246,7 +246,7 @@ const ToolManager = {
         if (typeof State !== 'undefined') {
             State.showLayers = false;
         }
-        ['layersBtn', 'canvasBtn', 'settingsBtn', 'tilemapBtn'].forEach((id) => {
+        ['layersBtn', 'canvasBtn', 'settingsBtn', 'tilemapBtn', 'atlasBtn'].forEach((id) => {
             document.getElementById(id)?.classList.remove('active');
         });
         if (typeof UIManager !== 'undefined' && UIManager.updatePanelForTool) {

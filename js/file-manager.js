@@ -136,7 +136,15 @@ const FileManager = {
             : Promise.resolve();
         
         State.markSaved();
-        return layerLoad.then(() => {
+        return layerLoad.then(async () => {
+            if (data.atlas && typeof TileAtlas !== 'undefined' && TileAtlas.fromJSON) {
+                try {
+                    await TileAtlas.fromJSON(data.atlas);
+                    TileAtlas.renderAll();
+                } catch (error) {
+                    console.warn('Could not restore tile atlas:', error);
+                }
+            }
             if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
             return data;
         });
@@ -144,7 +152,7 @@ const FileManager = {
     
     // Create project data structure
     createProjectData() {
-        return {
+        const project = {
             version: '1.0',
             timestamp: new Date().toISOString(),
             settings: {
@@ -162,6 +170,14 @@ const FileManager = {
             palette: PaletteManager.getAllColors(),
             layers: LayerManager.getLayerData()
         };
+
+        // The atlas is optional in the file format so older projects still
+        // open cleanly; new saves carry every mask plus the test map.
+        if (typeof TileAtlas !== 'undefined' && TileAtlas.toJSON) {
+            project.atlas = TileAtlas.toJSON();
+        }
+
+        return project;
     },
     
     // Export as image

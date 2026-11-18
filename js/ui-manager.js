@@ -122,6 +122,17 @@ const UIManager = {
                 this.setActiveSidebarButton('tilemapBtn');
             });
         }
+
+        // 5. Listen for Atlas Button (prevent event bubbling)
+        const atlasBtn = document.getElementById('atlasBtn');
+        if (atlasBtn) {
+            atlasBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.showPanelSections(['panel-atlas']);
+                this.setActiveSidebarButton('atlasBtn');
+            });
+        }
     },
 
     setupBrushControlsDrag() {
@@ -286,7 +297,8 @@ const UIManager = {
             'panel-tool-options',
             'panel-layers',
             'panel-tool-canvas',
-            'panel-tilemap'
+            'panel-tilemap',
+            'panel-atlas'
         ];
 
         allSections.forEach(id => {
@@ -323,7 +335,7 @@ const UIManager = {
      */
     setActiveSidebarButton(activeId) {
         // Only deactivate sidebar buttons (layers, canvas, settings, tilemap), not drawing tools
-        const sidebarButtons = ['layersBtn', 'canvasBtn', 'settingsBtn', 'tilemapBtn'];
+        const sidebarButtons = ['layersBtn', 'canvasBtn', 'settingsBtn', 'tilemapBtn', 'atlasBtn'];
         sidebarButtons.forEach(buttonId => {
             const btn = document.getElementById(buttonId);
             if (btn) btn.classList.remove('active');

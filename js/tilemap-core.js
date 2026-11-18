@@ -333,6 +333,11 @@ const TilemapCore = {
         // TilemapCore owns the stroke lifecycle, so this is where a completed
         // paint stroke becomes an undoable history entry.
         State.saveState();
+        // Save the finished stroke back into the selected atlas mask so the
+        // neighbour preview stays in sync with the editor.
+        if (typeof TileAtlas !== 'undefined' && TileAtlas.onEditorCommit) {
+            TileAtlas.onEditorCommit();
+        }
     },
     
     updatePreviews() {
@@ -359,6 +364,11 @@ const TilemapCore = {
         DOM.previewContexts.forEach((ctx, index) => {
             ctx.putImageData(imageData, 0, 0);
         });
+
+        // Keep the dual-grid neighbour preview live while drawing.
+        if (typeof TileAtlas !== 'undefined' && TileAtlas.refreshPreview) {
+            TileAtlas.refreshPreview();
+        }
 
         console.log('Preview update completed successfully');
     },

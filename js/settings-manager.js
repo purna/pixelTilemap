@@ -687,6 +687,11 @@ const SettingsManager = {
         Config.TILE_DIM = width;
         Config.CANVAS_SIZE = newCanvasSize;
 
+        // Keep the dual-grid atlas at the same native tile resolution.
+        if (typeof TileAtlas !== 'undefined' && TileAtlas.ready && TileAtlas.resizeTiles) {
+            TileAtlas.resizeTiles(width);
+        }
+
         // NOTE: --canvas-size is the on-screen display size, not the internal
         // buffer size. Leaving it fixed keeps a 32×32 tile readable on screen
         // and prevents a 128×128 tile from becoming thousands of CSS pixels.

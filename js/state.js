@@ -310,6 +310,9 @@ const State = {
         return Promise.all(imageLoads).then(() => {
             if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
             if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+            if (typeof TileAtlas !== 'undefined' && TileAtlas.onEditorCommit) {
+                TileAtlas.onEditorCommit();
+            }
             this.updateUI();
         });
     },

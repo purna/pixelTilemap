@@ -59,6 +59,11 @@ const App = {
             console.warn('TilemapCore.updatePreviews not available');
         }
 
+        // Dual-grid atlas + neighbour preview (starter packs and persistence)
+        if (typeof TileAtlas !== 'undefined' && TileAtlas.init) {
+            await TileAtlas.init();
+        }
+
         ToolManager.init();
         FileManager.init();
         SettingsManager.init();
