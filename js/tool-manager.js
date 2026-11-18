@@ -59,7 +59,7 @@ const ToolManager = {
             DOM.elements.sprayDensity.addEventListener('input', (e) => {
                 State.sprayDensity = parseInt(e.target.value, 10);
                 if (DOM.elements.sprayDensityDisplay) {
-                    DOM.elements.sprayDensityDisplay.textContent = State.sprayDensity;
+                    DOM.elements.sprayDensityDisplay.textContent = `${State.sprayDensity}%`;
                 }
             });
         }
@@ -180,6 +180,14 @@ const ToolManager = {
                 button.classList.add('active');
             }
         });
+
+        // Spray works on a 3×3 logical-pixel minimum.
+        if (DOM.elements.brushSizeSlider) {
+            DOM.elements.brushSizeSlider.min = tool === 'spray' ? '1' : '0';
+        }
+        if (tool === 'spray' && State.brushSize < 1) {
+            this.setBrushSize(1);
+        }
 
         // Update tool options visibility
         this.showToolOptions(tool);
@@ -318,7 +326,10 @@ const ToolManager = {
     },
 
     attachPresetButtonListeners() {
-        // Use event delegation on document level to handle dynamically created buttons
+        // Use event delegation on document level to handle dynamically created buttons.
+        // Bind once; updateBrushSizePresets replaces the buttons, not the listener.
+        if (this._presetDelegationAttached) return;
+        this._presetDelegationAttached = true;
         // Exclude opacity buttons which have their own handlers
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('preset-btn') && !e.target.classList.contains('opacity-btn')) {

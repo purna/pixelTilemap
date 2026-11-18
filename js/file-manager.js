@@ -105,11 +105,21 @@ const FileManager = {
                 State.setOpacity(data.settings.opacity);
                 DOM.elements.opacitySlider.value = data.settings.opacity * 100;
             }
+            if (data.settings.sprayDensity !== undefined) {
+                State.sprayDensity = data.settings.sprayDensity;
+            }
+            if (data.settings.sprayOpacityVariation !== undefined) {
+                State.sprayOpacityVariation = data.settings.sprayOpacityVariation;
+            }
+            if (data.settings.sprayUsePalette !== undefined) {
+                State.sprayUsePalette = !!data.settings.sprayUsePalette;
+            }
             if (data.settings.currentColor) {
                 State.setColor(data.settings.currentColor);
                 DOM.elements.colorPicker.value = data.settings.currentColor;
                 DOM.elements.colorHex.value = data.settings.currentColor;
             }
+            State.updateUI();
         }
         
         // Load palette
@@ -137,6 +147,9 @@ const FileManager = {
             settings: {
                 brushSize: State.brushSize,
                 opacity: State.opacity,
+                sprayDensity: State.sprayDensity,
+                sprayOpacityVariation: State.sprayOpacityVariation,
+                sprayUsePalette: State.sprayUsePalette,
                 currentColor: State.currentColor,
                 canvasSize: { width: Config.CANVAS_SIZE, height: Config.CANVAS_SIZE },
                 tileDim: Config.TILE_DIM,

@@ -40,7 +40,7 @@ class TutorialConfig {
                         arrowPositionOverride: 'middle-third',
                         marginOverride: '20px',
                         heading: 'Drawing Tools',
-                        content: 'Use these tools to create your tile patterns: Pencil (P), Brush (B), Eraser (E), and Color Picker (I). Each tool has keyboard shortcuts for quick access.',
+                        content: 'Use these tools to create your tile patterns: Pencil (P), Brush (B), Spray Can (S), Eraser (E), and Color Picker (I). Each tool has keyboard shortcuts for quick access.',
                         showNext: true,
                         showSkip: true
                     },

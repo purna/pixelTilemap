@@ -7,7 +7,7 @@ const State = {
     currentColor: '#282828',
     brushSize: 0,  // 1x1 brush for pencil tool
     opacity: 1.0,
-    sprayDensity: 14,
+    sprayDensity: 50,
     sprayOpacityVariation: 0.5,
     sprayUsePalette: false,
     
@@ -360,7 +360,7 @@ const State = {
         const sprayDensity = document.getElementById('sprayDensity');
         const sprayDensityDisplay = document.getElementById('sprayDensityDisplay');
         if (sprayDensity) sprayDensity.value = this.sprayDensity;
-        if (sprayDensityDisplay) sprayDensityDisplay.textContent = this.sprayDensity;
+        if (sprayDensityDisplay) sprayDensityDisplay.textContent = `${this.sprayDensity}%`;
 
         const sprayOpacityVariation = document.getElementById('sprayOpacityVariation');
         const sprayOpacityVariationDisplay = document.getElementById('sprayOpacityVariationDisplay');

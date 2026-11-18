@@ -172,7 +172,7 @@ const InputHandler = {
             'i': 'eyedropper'
         };
         
-        if (toolShortcuts[key] && typeof ToolManager !== 'undefined') {
+        if (!ctrl && toolShortcuts[key] && typeof ToolManager !== 'undefined') {
             ToolManager.setTool(toolShortcuts[key]);
             e.preventDefault();
             return;

@@ -2,6 +2,9 @@
 // Core tilemap functionality - seamless drawing across 3x3 canvas grid
 
 const TilemapCore = {
+    sprayTimer: null,
+    sprayPoint: null,
+
     init() {
         this.setupEventListeners();
         // Initialize layer system if it exists
@@ -128,6 +131,18 @@ const TilemapCore = {
         const absTileX = tileX + deltaX;
         const absTileY = tileY + deltaY;
         
+        // Spray can: emit a random dither stamp and keep spraying while held.
+        if (State.currentTool === 'spray') {
+            this.sprayPoint = { x: absTileX, y: absTileY };
+            if (e.type === 'mousedown' || e.type === 'touchstart' || e.type === 'contextmenu') {
+                this.sprayAt(absTileX, absTileY);
+                this.startSpray();
+                this.updatePreviews();
+                State.markUnsaved();
+            }
+            return;
+        }
+
         // Use the actual brush size for both pencil and brush tools
         // Pencil tool will still maintain hard edges but respect the size setting
         const drawR = State.brushSize;
@@ -186,7 +201,97 @@ const TilemapCore = {
         ctx.restore();
     },
     
+    startSpray() {
+        if (this.sprayTimer) return;
+        this.sprayTimer = setInterval(() => {
+            if (!State.isDrawing || State.currentTool !== 'spray' || !this.sprayPoint) return;
+            this.sprayAt(this.sprayPoint.x, this.sprayPoint.y);
+            this.updatePreviews();
+            State.markUnsaved();
+        }, 80);
+    },
+
+    stopSpray() {
+        if (this.sprayTimer) {
+            clearInterval(this.sprayTimer);
+            this.sprayTimer = null;
+        }
+    },
+
+    sprayAt(absTileX, absTileY) {
+        const activeLayer = State.layers[State.activeLayerIndex];
+        const ctx = activeLayer ? activeLayer.canvas.getContext('2d') : DOM.editorCtx;
+        const radius = Math.max(1, Math.round(State.brushSize));
+        const density = Math.max(0.01, Math.min(1, (State.sprayDensity ?? 50) / 100));
+        const variation = Math.max(0, Math.min(1, State.sprayOpacityVariation));
+        const erasing = State.currentBrush === Config.ERASE_COLOR;
+
+        let colors;
+        if (erasing) {
+            colors = ['transparent'];
+        } else if (State.sprayUsePalette && Array.isArray(State.paletteColors) && State.paletteColors.length) {
+            // Include the current colour so the spray always stays related to
+            // the active swatch while dithering through the palette.
+            colors = [State.currentColor, ...State.paletteColors];
+        } else {
+            colors = [State.currentColor];
+        }
+
+        // Build the logical-pixel cells in the spray circle. Each cell is a
+        // real tile pixel (16×16 screen pixels), never a sub-pixel repeat.
+        const cells = [];
+        for (let dy = -radius; dy <= radius; dy++) {
+            for (let dx = -radius; dx <= radius; dx++) {
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance > radius + 0.5) continue;
+                // Centre cells are much more likely to be selected than edges.
+                const weight = Math.max(0.08, 1 - distance / (radius + 1.5));
+                cells.push({ dx, dy, distance, weight });
+            }
+        }
+
+        // At the 3×3 minimum, paint 3–6 of the 9 cells per stamp. Larger
+        // brushes scale the count with the area and the density setting.
+        let count;
+        if (radius === 1) {
+            if (density >= 0.95) {
+                count = 9;
+            } else {
+                const base = 3 + density * 3;
+                count = Math.round(base + (Math.random() * 2 - 1) * 1.5);
+                count = Math.max(3, Math.min(6, count));
+            }
+        } else {
+            const base = cells.length * density;
+            const jitter = Math.max(1, Math.round(base * 0.25));
+            count = Math.round(base + (Math.random() * 2 - 1) * jitter);
+            count = Math.max(1, Math.min(cells.length, count));
+        }
+
+        // Weighted sampling without replacement: pick distinct cells, with
+        // centre cells favoured over edge cells.
+        const chosen = cells
+            .map((cell) => ({ cell, rank: Math.pow(Math.random(), 1 / cell.weight) }))
+            .sort((a, b) => b.rank - a.rank)
+            .slice(0, count);
+
+        for (const { cell } of chosen) {
+            const brushAbsX = absTileX + cell.dx;
+            const brushAbsY = absTileY + cell.dy;
+            const drawX = (brushAbsX % Config.TILE_DIM + Config.TILE_DIM) % Config.TILE_DIM;
+            const drawY = (brushAbsY % Config.TILE_DIM + Config.TILE_DIM) % Config.TILE_DIM;
+
+            // Centre particles are more opaque; edges fade out. Each particle
+            // also gets a random opacity variation for a soft dither.
+            const radialAlpha = 1 - Math.min(0.55, (cell.distance / (radius + 1)) * 0.55);
+            const alpha = State.opacity * radialAlpha * (1 - variation * Math.random());
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            this.drawPixel(ctx, drawX, drawY, color, alpha);
+        }
+    },
+
     stopDrawing() {
+        this.stopSpray();
         if (!State.isDrawing) return;
         State.setDrawing(false);
         // TilemapCore owns the stroke lifecycle, so this is where a completed
