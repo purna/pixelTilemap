@@ -788,10 +788,12 @@ const SettingsManager = {
         const tileGrid = document.querySelector('.tile-grid');
         if (tileGrid) {
             if (color === 'transparent') {
+                // Let the workspace's single subtle checkerboard show through
+                // so every empty slot looks identical.
                 tileGrid.style.backgroundColor = 'transparent';
-                tileGrid.style.backgroundImage = 'linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)';
-                tileGrid.style.backgroundSize = '20px 20px';
-                tileGrid.style.backgroundPosition = '0 0, 0 10px, 10px -10px, -10px 0px';
+                tileGrid.style.backgroundImage = 'none';
+                tileGrid.style.backgroundSize = '';
+                tileGrid.style.backgroundPosition = '';
             } else {
                 tileGrid.style.backgroundColor = color;
                 tileGrid.style.backgroundImage = 'none';

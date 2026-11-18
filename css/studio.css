@@ -852,13 +852,7 @@ input[type="range"].ds-range,
     border-radius: 10px;
     overflow: visible;
     transform-origin: center center;
-    background-image:
-        linear-gradient(45deg, #1a1f36 25%, transparent 25%),
-        linear-gradient(-45deg, #1a1f36 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #1a1f36 75%),
-        linear-gradient(-45deg, transparent 75%, #1a1f36 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    background: transparent;
 }
 
 .tile-grid {
@@ -870,7 +864,7 @@ input[type="range"].ds-range,
     box-shadow: 0 0 0 1px rgba(67, 217, 255, 0.18), 0 22px 50px rgba(0, 0, 0, 0.45);
     border-radius: 8px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: transparent;
 }
 
 /* Each neighbouring cell shows only the half or quarter closest to the
@@ -1339,31 +1333,51 @@ input[type="range"].ds-range,
     gap: 4px;
 }
 
-.tilemap-square {
+/* Tilemap Manager slots: every empty slot uses the same subtle
+   checkerboard, whether it is active, central or inactive. */
+#panel-tilemap .tilemap-square,
+#panel-tilemap .tilemap-square.active,
+#panel-tilemap .tilemap-square.center,
+#panel-tilemap .tilemap-square.center.active {
     aspect-ratio: 1;
     border-radius: 5px;
     overflow: hidden;
-    border: 1px solid var(--line);
-    background: var(--bg-1);
+    background-color: transparent !important;
+    background-image:
+        linear-gradient(45deg, rgba(255, 255, 255, 0.045) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.045) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.045) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.045) 75%) !important;
+    background-size: 12px 12px !important;
+    background-position: 0 0, 0 6px, 6px -6px, -6px 0 !important;
+    border: 1px solid var(--line) !important;
+    box-shadow: none !important;
 }
 
-.tilemap-square canvas {
+#panel-tilemap .tilemap-square::before {
+    content: none !important;
+    display: none !important;
+}
+
+#panel-tilemap .tilemap-square canvas {
     width: 100%;
     height: 100%;
     image-rendering: pixelated;
+    background: transparent;
 }
 
-.tilemap-square:hover:not(.center) {
-    border-color: var(--cyan);
+#panel-tilemap .tilemap-square:hover:not(.center) {
+    border-color: var(--cyan) !important;
 }
 
-.tilemap-square.active {
-    border-color: var(--green);
-    box-shadow: 0 0 0 1px rgba(126, 224, 74, 0.4);
+#panel-tilemap .tilemap-square.active:not(.center) {
+    border-color: var(--green) !important;
+    box-shadow: 0 0 0 1px rgba(126, 224, 74, 0.4) !important;
 }
 
-.tilemap-square.center {
-    border-color: var(--cyan);
+#panel-tilemap .tilemap-square.center {
+    border-color: var(--cyan) !important;
+    box-shadow: 0 0 0 1px rgba(67, 217, 255, 0.25) !important;
 }
 
 .tilemap-info {

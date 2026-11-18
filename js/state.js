@@ -342,20 +342,16 @@ const State = {
         if (colorHex && /^#[A-Fa-f0-9]{6}$/.test(validColor)) colorHex.value = validColor;
         
         // Update brush controls
-        const brushSize = document.getElementById('brush-size');
-        const brushSizeValue = document.getElementById('brush-size-value');
+        const brushSize = document.getElementById('brushSizeSlider');
+        const brushSizeValue = document.getElementById('brushSizeDisplay');
         if (brushSize) brushSize.value = this.brushSize;
         if (brushSizeValue) brushSizeValue.textContent = `${this.brushSize * 2 + 1} px`;
         
         // Update opacity controls
         const opacitySlider = document.getElementById('opacitySlider');
         const opacityDisplay = document.getElementById('opacityDisplay');
-        const opacityHeader = document.getElementById('opacityHeaderValue');
-        const floatingOpacity = document.getElementById('brush-opacity');
         if (opacitySlider) opacitySlider.value = this.opacity * 100;
-        if (opacityDisplay) opacityDisplay.textContent = Math.round(this.opacity * 100);
-        if (opacityHeader) opacityHeader.textContent = `${Math.round(this.opacity * 100)}%`;
-        if (floatingOpacity) floatingOpacity.value = this.opacity * 100;
+        if (opacityDisplay) opacityDisplay.textContent = `${Math.round(this.opacity * 100)}%`;
         
         // Update panel visibility
         const layersPanel = document.getElementById('panel-layers');

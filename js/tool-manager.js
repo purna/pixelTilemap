@@ -16,18 +16,7 @@ const ToolManager = {
         // Assuming Config.DEFAULT_BRUSH_SIZE is 0.
         this.setBrushSize(Config.DEFAULT_BRUSH_SIZE);
 
-        // Sync opacity sliders
-        this.syncOpacitySliders();
-
         console.log('Tool Manager initialized');
-    },
-
-    syncOpacitySliders() {
-        const brushOpacitySlider = document.getElementById('brush-opacity');
-        if (brushOpacitySlider && DOM.elements.opacitySlider) {
-            // Set initial values to match
-            brushOpacitySlider.value = DOM.elements.opacitySlider.value;
-        }
     },
 
     setupEventListeners() {
@@ -48,44 +37,22 @@ const ToolManager = {
             });
         }
 
-        // Brush size slider (center workspace)
-        DOM.elements.brushSizeSlider.addEventListener('input', (e) => {
-            const size = parseInt(e.target.value, 10);
-            State.setBrushSize(size);
-            DOM.updateBrushDisplay(size);
-            this.updateActivePresetButton(size);
-            this.updatePanelBrushDisplay(size);
-        });
-
         // Brush size slider (right panel)
-        DOM.elements.brushSizeSliderPanel.addEventListener('input', (e) => {
-            const size = parseInt(e.target.value, 10);
-            this.setBrushSize(size); // Use the new helper method
-        });
+        if (DOM.elements.brushSizeSlider) {
+            DOM.elements.brushSizeSlider.addEventListener('input', (e) => {
+                const size = parseInt(e.target.value, 10);
+                this.setBrushSize(size);
+            });
+        }
 
         // Opacity slider (right panel)
-        DOM.elements.opacitySlider.addEventListener('input', (e) => {
-            const opacity = e.target.value / 100;
-            State.setOpacity(opacity);
-            // Update display immediately
-            if (DOM.elements.opacityDisplay) {
-                DOM.elements.opacityDisplay.textContent = e.target.value;
-            }
-            // Update opacity preset buttons
-            if (typeof InputHandler !== 'undefined' && InputHandler.updatePresetOpacityButtons) {
-                InputHandler.updatePresetOpacityButtons(opacity);
-            }
-        });
-
-        // Brush opacity slider (floating overlay)
-        const brushOpacitySlider = document.getElementById('brush-opacity');
-        if (brushOpacitySlider) {
-            brushOpacitySlider.addEventListener('input', (e) => {
+        if (DOM.elements.opacitySlider) {
+            DOM.elements.opacitySlider.addEventListener('input', (e) => {
                 const opacity = e.target.value / 100;
                 State.setOpacity(opacity);
-                // Sync with right panel slider
-                if (DOM.elements.opacitySlider) {
-                    DOM.elements.opacitySlider.value = e.target.value;
+                // Update display immediately
+                if (DOM.elements.opacityDisplay) {
+                    DOM.elements.opacityDisplay.textContent = `${e.target.value}%`;
                 }
                 // Update opacity preset buttons
                 if (typeof InputHandler !== 'undefined' && InputHandler.updatePresetOpacityButtons) {
@@ -160,20 +127,16 @@ const ToolManager = {
     },
 
     updateBrushSizeLabel() {
-        const label = DOM.elements.brushSizeLabel;
         const labelPanel = DOM.elements.brushSizeLabelPanel;
         
-        if (!label || !labelPanel) return;
+        if (!labelPanel) return;
         
         if (State.currentTool === 'pencil') {
-            label.textContent = 'Pencil Size:';
-            labelPanel.textContent = 'Pencil Size';
+            labelPanel.textContent = 'Pencil Size:';
         } else if (State.currentTool === 'eraser') {
-            label.textContent = 'Eraser Size:';
-            labelPanel.textContent = 'Eraser Size';
+            labelPanel.textContent = 'Eraser Size:';
         } else {
-            label.textContent = 'Brush Size:';
-            labelPanel.textContent = 'Brush Size';
+            labelPanel.textContent = 'Brush Size:';
         }
     },
 
@@ -216,31 +179,11 @@ const ToolManager = {
         State.setBrushSize(radius);
 
         // 2. Update UI (slider and displays)
-        DOM.elements.brushSizeSliderPanel.value = radius;
-        DOM.updateBrushDisplay(radius); // Updates the center workspace display (e.g., "1x1")
-        this.updatePanelBrushDisplay(radius); // Updates the panel size display (e.g., "1px")
-        this.updateActivePresetButton(radius);
-    },
-
-    updatePanelBrushDisplay(radius) {
-        // Update the panel brush size display (e.g., "1x1", "3x3", etc.)
-        const display = document.getElementById('brushSizeDisplay');
-        if (display) {
-            const actualSize = 2 * radius + 1; // Convert radius to actual brush size
-            display.textContent = `${actualSize}x${actualSize}`;
+        if (DOM.elements.brushSizeSlider) {
+            DOM.elements.brushSizeSlider.value = radius;
         }
-    },
-
-    updateActivePresetButton(radius) {
-        const currentSize = 2 * radius + 1;
-        document.querySelectorAll('.preset-size').forEach(button => {
-            button.classList.remove('active');
-            const presetSize = parseInt(button.dataset.size, 10);
-
-            if (presetSize === currentSize) {
-                button.classList.add('active');
-            }
-        });
+        DOM.updateBrushDisplay(radius);
+        this.updateActivePresetButton(radius);
     },
 
     updateToolUI() {

@@ -68,11 +68,8 @@ const DOM = {
             zoomDisplay: document.getElementById('zoomDisplay'),
 
             // Controls
-            brushSizeSlider: document.getElementById('brush-size'),
-            brushSizeValue: document.getElementById('brush-size-value'),
-            brushSizeSliderPanel: document.getElementById('brushSizeSlider'),
-            brushSizeDisplay: document.getElementById('brushSizeDisplay'),
-            brushSizeLabel: document.querySelector('label[for="brush-size"]'),
+            brushSizeSlider: document.getElementById('brushSizeSlider'),
+            brushSizeValue: document.getElementById('brushSizeDisplay'),
             brushSizeLabelPanel: document.getElementById('brushSizeLabelPanel'),
             colorPicker: document.getElementById('colorPicker'),
             colorHex: document.getElementById('colorHex'),
@@ -96,7 +93,7 @@ const DOM = {
 
         // Initialize default values
         if (this.elements.brushSizeValue) {
-            this.elements.brushSizeValue.textContent = `1`;
+            this.elements.brushSizeValue.textContent = `1 px`;
         }
 
         console.log('DOM initialized successfully');
@@ -105,7 +102,7 @@ const DOM = {
     updateBrushDisplay(radius) {
         const size = 2 * radius + 1;
         if (this.elements.brushSizeValue) {
-            this.elements.brushSizeValue.textContent = `${size}x${size}`;
+            this.elements.brushSizeValue.textContent = `${size} px`;
         }
     },
 

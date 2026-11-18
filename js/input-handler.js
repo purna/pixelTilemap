@@ -351,13 +351,12 @@ const InputHandler = {
         document.querySelectorAll('.preset-size').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const size = parseInt(e.target.dataset.size);
+                if (isNaN(size)) return;
                 State.setBrushSize(size);
-                if (DOM.elements.brushSizeSliderPanel) {
-                    DOM.elements.brushSizeSliderPanel.value = size;
+                if (DOM.elements.brushSizeSlider) {
+                    DOM.elements.brushSizeSlider.value = size;
                 }
-                if (DOM.elements.brushSizeDisplay) {
-                    DOM.elements.brushSizeDisplay.textContent = size;
-                }
+                DOM.updateBrushDisplay(size);
                 this.updatePresetBrushButtons(size);
             });
         });
@@ -374,7 +373,7 @@ const InputHandler = {
                     DOM.elements.opacitySlider.value = opacity * 100;
                 }
                 if (DOM.elements.opacityDisplay) {
-                    DOM.elements.opacityDisplay.textContent = Math.round(opacity * 100);
+                    DOM.elements.opacityDisplay.textContent = `${Math.round(opacity * 100)}%`;
                 }
                 this.updatePresetOpacityButtons(opacity);
             });

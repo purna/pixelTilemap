@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="css/settings.css?v=6">
     <link rel="stylesheet" href="css/tutorials.css">
     <!-- Studio layout + design layer (loads last) -->
-    <link rel="stylesheet" href="css/studio.css?v=6">
+    <link rel="stylesheet" href="css/studio.css?v=8">
     <!-- Custom Fonts -->
     <style>
         @font-face {
@@ -122,35 +122,6 @@
                             data-tooltip="**Color Picker**\n--Sample colors--\nShortcut: I">
                             <i class="fas fa-eye-dropper"></i><span>Picker</span>
                         </button>
-                    </div>
-                </section>
-
-                <section class="ds-section">
-                    <div class="ds-section-head">
-                        <h2><i class="fas fa-sliders"></i> Brush</h2>
-                        <span id="brush-size-value" class="ds-pill">1</span>
-                    </div>
-                    <div class="ds-row ds-between">
-                        <label class="ds-label" for="brush-size">Size</label>
-                    </div>
-                    <input type="range" id="brush-size" class="ds-range" min="0" max="15" value="0">
-                    <div class="ds-preset-row" id="floating-brush-presets">
-                        <button class="preset-btn" data-size="0">1</button>
-                        <button class="preset-btn" data-size="1">3</button>
-                        <button class="preset-btn" data-size="3">7</button>
-                        <button class="preset-btn" data-size="5">11</button>
-                    </div>
-
-                    <div class="ds-row ds-between" style="margin-top:12px;">
-                        <label class="ds-label" for="brush-opacity">Opacity</label>
-                        <span id="opacityHeaderValue" class="ds-pill">100%</span>
-                    </div>
-                    <input type="range" id="brush-opacity" class="ds-range" min="0" max="100" value="100">
-                    <div class="ds-preset-row" id="opacity-presets">
-                        <button class="preset-btn opacity-btn" data-opacity="0.25">25%</button>
-                        <button class="preset-btn opacity-btn" data-opacity="0.5">50%</button>
-                        <button class="preset-btn opacity-btn" data-opacity="0.75">75%</button>
-                        <button class="preset-btn opacity-btn active" data-opacity="1">100%</button>
                     </div>
                 </section>
 
@@ -282,20 +253,31 @@
 
                 <!-- Tool Options Section -->
                 <section id="panel-tool-options" class="panel-section">
-                    <div class="section-title"><span><i class="fas fa-sliders"></i> Tool Options</span></div>
-                    <div id="panel-tool-control" class="ds-field">
-                        <div class="ds-row ds-between">
-                            <label class="ds-label" for="brushSizeSlider"><span id="brushSizeLabelPanel">Brush Size</span></label>
-                            <span class="ds-pill" id="brushSizeDisplay">1</span>
-                        </div>
-                        <input type="range" id="brushSizeSlider" class="ds-range" min="0" max="15" value="0" aria-label="Brush size">
+                    <div class="ds-section-head">
+                        <h2><i class="fas fa-sliders"></i> Tool Options</h2>
+                        <span id="brushSizeDisplay" class="ds-pill">1 px</span>
                     </div>
-                    <div id="panel-opacity-control" class="ds-field">
-                        <div class="ds-row ds-between">
-                            <label class="ds-label" for="opacitySlider">Opacity</label>
-                            <span class="ds-pill" id="opacityDisplay">100</span>
-                        </div>
-                        <input type="range" id="opacitySlider" class="ds-range" min="0" max="100" value="100" aria-label="Opacity">
+                    <div class="ds-row ds-between">
+                        <label class="ds-label" for="brushSizeSlider"><span id="brushSizeLabelPanel">Pencil Size:</span></label>
+                    </div>
+                    <input type="range" id="brushSizeSlider" class="ds-range" min="0" max="15" value="0" aria-label="Brush size">
+                    <div class="ds-preset-row" id="floating-brush-presets">
+                        <button class="preset-btn" data-size="0">1</button>
+                        <button class="preset-btn" data-size="1">2</button>
+                        <button class="preset-btn" data-size="2">3</button>
+                        <button class="preset-btn" data-size="3">4</button>
+                    </div>
+
+                    <div class="ds-row ds-between" style="margin-top:12px;">
+                        <label class="ds-label" for="opacitySlider">Opacity</label>
+                        <span id="opacityDisplay" class="ds-pill">100%</span>
+                    </div>
+                    <input type="range" id="opacitySlider" class="ds-range" min="0" max="100" value="100" aria-label="Opacity">
+                    <div class="ds-preset-row" id="opacityPresets">
+                        <button class="preset-btn opacity-btn" data-opacity="0.25">25%</button>
+                        <button class="preset-btn opacity-btn" data-opacity="0.5">50%</button>
+                        <button class="preset-btn opacity-btn" data-opacity="0.75">75%</button>
+                        <button class="preset-btn opacity-btn active" data-opacity="1">100%</button>
                     </div>
                 </section>
 
@@ -728,8 +710,8 @@
 
     <!-- Core modules -->
     <script src="js/config.js?v=6"></script>
-    <script src="js/state.js?v=10"></script>
-    <script src="js/dom.js?v=6"></script>
+    <script src="js/state.js?v=11"></script>
+    <script src="js/dom.js?v=7"></script>
     <script src="js/notifications.js"></script>
 
     <!-- UI Components -->
@@ -739,18 +721,18 @@
     <script src="js/tilemap-core.js?v=7"></script>
     <script src="js/palette-manager.js?v=6"></script>
     <script src="js/layer-manager.js?v=7"></script>
-    <script src="js/tool-manager.js?v=6"></script>
+    <script src="js/tool-manager.js?v=7"></script>
     <script src="js/file-manager.js?v=7"></script>
     <script src="js/terrain-grid.js?v=8"></script>
     <script src="js/tilemap-manager.js?v=6"></script>
     <script src="js/tile-library.js?v=7"></script>
-    <script src="js/settings-manager.js?v=9"></script>
+    <script src="js/settings-manager.js?v=10"></script>
     <script src="js/zoom-manager.js?v=7"></script>
     <script src="js/tutorialConfig.js?v=2"></script>
     <script src="js/tutorialSystem.js"></script>
 
     <!-- Input handling -->
-    <script src="js/input-handler.js?v=6"></script>
+    <script src="js/input-handler.js?v=7"></script>
     <script src="js/ui-manager.js?v=6"></script>
 
     <!-- Main application -->
