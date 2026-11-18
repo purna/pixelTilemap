@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="css/settings.css?v=6">
     <link rel="stylesheet" href="css/tutorials.css">
     <!-- Studio layout + design layer (loads last) -->
-    <link rel="stylesheet" href="css/studio.css?v=1">
+    <link rel="stylesheet" href="css/studio.css?v=2">
     <!-- Custom Fonts -->
     <style>
         @font-face {
@@ -309,7 +309,8 @@
                         </button>
                     </div>
                     <div class="size-description">
-                        Set the canvas dimensions (4-512 pixels)
+                        Set the tile resolution (4–512 px). Tiles are square, so height follows width;
+                        existing artwork is resampled to the new resolution.
                     </div>
                     <div class="canvas-presets" id="canvasPresets" role="group" aria-label="Common tile sizes">
                         <span class="ds-label">Common tile sizes</span>
@@ -395,8 +396,8 @@
                                 <i class="fas fa-square" style="color:#c68b52"></i> Dirt
                             </button>
                         </div>
-                        <button type="button" class="btn primary terrain-apply-btn" id="terrain-apply-btn" title="Replace the active canvas with this terrain grid">
-                            <i class="fas fa-paint-brush"></i> Load to Canvas
+                        <button type="button" class="btn primary terrain-apply-btn" id="terrain-apply-btn" title="Load the centre tile of this terrain sample into the canvas">
+                            <i class="fas fa-paint-brush"></i> Load Centre Tile
                         </button>
                         <div class="terrain-grid-legend">
                             <span><i class="terrain-legend-swatch grass"></i> Grass</span>

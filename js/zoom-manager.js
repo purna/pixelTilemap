@@ -126,13 +126,18 @@ const ZoomManager = {
         const tileGrid = document.querySelector('.tile-grid');
         
         if (tileGridContainer && tileGrid) {
-            // Apply zoom to the entire tile grid container
-            tileGridContainer.style.transform = `scale(${State.zoom})`;
-            tileGridContainer.style.transformOrigin = 'center center';
-            
-            // Note: We don't set width/height here because the CSS transform
-            // scale() handles the visual scaling. Setting width/height would
-            // cause double-scaling (scale transform + layout size change).
+            // Prefer CSS zoom: unlike transform: scale() it grows the layout box,
+            // so the editor stage can scroll when the user zooms in.
+            const supportsZoom = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('zoom', '2');
+            if (supportsZoom) {
+                tileGridContainer.style.zoom = String(State.zoom);
+                tileGridContainer.style.transform = 'none';
+                tileGridContainer.style.transformOrigin = '';
+            } else {
+                tileGridContainer.style.zoom = '';
+                tileGridContainer.style.transform = `scale(${State.zoom})`;
+                tileGridContainer.style.transformOrigin = 'center center';
+            }
         }
     },
 

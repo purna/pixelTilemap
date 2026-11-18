@@ -120,22 +120,14 @@ const TerrainGrid = {
 
     applyToCanvas() {
         if (typeof State === 'undefined' || typeof DOM === 'undefined') return;
-        if (!confirm('Replace the current canvas with this 3×3 terrain sample?')) return;
+        if (!confirm('Load the centre tile of this terrain sample into the canvas? The current canvas will be replaced.')) return;
 
-        const composite = document.createElement('canvas');
-        composite.width = this.TILE * 3;
-        composite.height = this.TILE * 3;
-        const compositeCtx = composite.getContext('2d');
-
-        for (let row = 0; row < 3; row++) {
-            for (let col = 0; col < 3; col++) {
-                const tileCanvas = document.createElement('canvas');
-                tileCanvas.width = this.TILE;
-                tileCanvas.height = this.TILE;
-                this.drawTile(tileCanvas.getContext('2d'), row, col);
-                compositeCtx.drawImage(tileCanvas, col * this.TILE, row * this.TILE);
-            }
-        }
+        // The app edits one seamless tile, not a 3×3 map. Load only the centre
+        // cell so the terrain sample is not squeezed into a single tile.
+        const tileCanvas = document.createElement('canvas');
+        tileCanvas.width = this.TILE;
+        tileCanvas.height = this.TILE;
+        this.drawTile(tileCanvas.getContext('2d'), 1, 1);
 
         // Clear every layer so the sample is shown by itself, then paint it
         // on the active layer.
@@ -152,7 +144,7 @@ const TerrainGrid = {
         targetCtx.save();
         targetCtx.imageSmoothingEnabled = false;
         targetCtx.clearRect(0, 0, targetLayer.canvas.width, targetLayer.canvas.height);
-        targetCtx.drawImage(composite, 0, 0, targetLayer.canvas.width, targetLayer.canvas.height);
+        targetCtx.drawImage(tileCanvas, 0, 0, targetLayer.canvas.width, targetLayer.canvas.height);
         targetCtx.restore();
 
         if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
@@ -161,7 +153,7 @@ const TerrainGrid = {
         if (typeof State.saveState === 'function') State.saveState();
 
         if (typeof Notifications !== 'undefined') {
-            new Notifications().success('Terrain sample loaded into the canvas');
+            new Notifications().success('Centre terrain tile loaded into the canvas');
         }
     },
 

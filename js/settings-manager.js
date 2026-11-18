@@ -34,7 +34,6 @@ const SettingsManager = {
 
         // The right-panel canvas controls must exist before the settings
         // modal is ever opened, so bind them during init rather than lazily.
-        this.setupPanelCanvasControls();
 
         // Ensure DOM is ready before setting up event listeners
         if (document.readyState === 'loading') {
@@ -67,6 +66,10 @@ const SettingsManager = {
     },
 
     setupEventListeners() {
+        // Bind the always-visible Canvas Options panel here so it works whether
+        // the DOM was already ready or we waited for DOMContentLoaded.
+        this.setupPanelCanvasControls();
+
         // Settings button click
         const settingsBtn = document.getElementById('settingsBtn');
         if (settingsBtn) {
@@ -113,6 +116,12 @@ const SettingsManager = {
                 heightInput.value = widthInput.value;
                 this.updateCanvasPresetState();
             });
+            widthInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (applyBtn) applyBtn.click();
+                }
+            });
         }
 
         // Common tile sizes applied immediately with one click.
@@ -156,8 +165,11 @@ const SettingsManager = {
     updateCanvasPresetState() {
         const presetWrap = document.getElementById('canvasPresets');
         if (!presetWrap) return;
+        const widthInput = document.getElementById('widthInput');
+        const typed = parseInt(widthInput && widthInput.value, 10);
+        const current = Number.isFinite(typed) ? typed : Config.TILE_DIM;
         presetWrap.querySelectorAll('[data-size]').forEach(button => {
-            button.classList.toggle('active', parseInt(button.dataset.size, 10) === Config.TILE_DIM);
+            button.classList.toggle('active', parseInt(button.dataset.size, 10) === current);
         });
     },
 
@@ -660,6 +672,9 @@ const SettingsManager = {
         if (persist) this.saveSettingsToStorage();
         if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
         if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
+        if (newCanvasSize !== oldCanvasSize && typeof State !== 'undefined' && State.markUnsaved) {
+            State.markUnsaved();
+        }
         if (typeof State !== 'undefined' && State.updateUI) State.updateUI();
         this.syncPanelCanvasInputs();
 

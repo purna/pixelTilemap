@@ -41,6 +41,10 @@
     --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
     --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
     --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+    /* On-screen size of one tile. This is deliberately independent of the
+       internal canvas resolution so 32 px and 128 px tiles both stay readable. */
+    --canvas-size: clamp(110px, calc((100vw - 660px) / 3), 320px);
 }
 
 * {
@@ -1185,6 +1189,63 @@ input[type="range"].ds-range,
     font-size: 10.5px;
     color: var(--muted);
     line-height: 1.5;
+}
+
+.canvas-presets {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line-soft);
+}
+
+.canvas-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    margin-top: 7px;
+}
+
+.canvas-preset {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 1px;
+    padding: 8px 4px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.15s ease;
+}
+
+.canvas-preset small {
+    font-size: 8px;
+    font-weight: 600;
+    color: var(--faint);
+}
+
+.canvas-preset:hover {
+    color: var(--text);
+    background: var(--bg-3);
+    border-color: #3b4775;
+}
+
+.canvas-preset.active {
+    color: #09210a;
+    background: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 10px rgba(126, 224, 74, 0.22);
+}
+
+.canvas-preset.active small {
+    color: rgba(9, 33, 10, 0.7);
+}
+
+.size-input[readonly] {
+    opacity: 0.72;
+    cursor: default;
 }
 
 /* Tilemap + terrain */
