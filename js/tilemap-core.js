@@ -64,8 +64,10 @@ const TilemapCore = {
             return;
         }
         
-        // Determine the brush type based on tool, mouse button, or event type
-        if (State.currentTool === 'eraser') {
+        // Determine the brush type based on tool, mouse button, or event type.
+        // Shift turns every tool into a quick hard eraser.
+        const shiftErase = !!e.shiftKey && State.currentTool !== 'eraser';
+        if (State.currentTool === 'eraser' || shiftErase) {
             // Eraser tool always uses erase color regardless of mouse button
             State.setBrush(Config.ERASE_COLOR);
             State.setDrawing(true);
@@ -95,7 +97,7 @@ const TilemapCore = {
         let y = ((clientY - rect.top) / rect.height) * targetCanvas.height;
 
         // Colour picker: sample the clicked canvas instead of painting.
-        if (State.currentTool === 'eyedropper') {
+        if (State.currentTool === 'eyedropper' && !shiftErase) {
             const pickX = Math.max(0, Math.min(targetCanvas.width - 1, Math.floor(x)));
             const pickY = Math.max(0, Math.min(targetCanvas.height - 1, Math.floor(y)));
             try {
@@ -131,8 +133,8 @@ const TilemapCore = {
         const absTileX = tileX + deltaX;
         const absTileY = tileY + deltaY;
         
-        // Spray can: emit a random dither stamp and keep spraying while held.
-        if (State.currentTool === 'spray') {
+        // Spray can (or spray eraser): emit a dither stamp while held.
+        if (this.isSprayMode() && !shiftErase) {
             this.sprayPoint = { x: absTileX, y: absTileY };
             if (e.type === 'mousedown' || e.type === 'touchstart' || e.type === 'contextmenu') {
                 this.sprayAt(absTileX, absTileY);
@@ -180,7 +182,24 @@ const TilemapCore = {
         const screenY = tileY * Config.PIXEL_SIZE;
         
         ctx.save();
-        
+
+        // Soft eraser lowers pixel alpha instead of clearing it outright.
+        if (color === 'transparent' && State.currentTool === 'eraser' && State.eraserType === 'soft') {
+            ctx.globalCompositeOperation = 'destination-out';
+            if (brushRadius > 0) {
+                const maxDistance = brushRadius + 1;
+                const normalizedDistance = distanceFromCenter / maxDistance;
+                const edgeAlpha = Math.max(0.1, 1.0 - (normalizedDistance * 0.8));
+                ctx.globalAlpha = opacity * edgeAlpha;
+            } else {
+                ctx.globalAlpha = opacity;
+            }
+            ctx.fillStyle = '#000';
+            ctx.fillRect(screenX, screenY, Config.PIXEL_SIZE, Config.PIXEL_SIZE);
+            ctx.restore();
+            return;
+        }
+
         // For brush tool, apply alpha gradient based on distance from center
         if (State.currentTool === 'brush' && brushRadius > 0) {
             const maxDistance = brushRadius + 1;
@@ -201,10 +220,15 @@ const TilemapCore = {
         ctx.restore();
     },
     
+    isSprayMode() {
+        return State.currentTool === 'spray'
+            || (State.currentTool === 'eraser' && State.eraserType === 'spray');
+    },
+
     startSpray() {
         if (this.sprayTimer) return;
         this.sprayTimer = setInterval(() => {
-            if (!State.isDrawing || State.currentTool !== 'spray' || !this.sprayPoint) return;
+            if (!State.isDrawing || !this.isSprayMode() || !this.sprayPoint) return;
             this.sprayAt(this.sprayPoint.x, this.sprayPoint.y);
             this.updatePreviews();
             State.markUnsaved();

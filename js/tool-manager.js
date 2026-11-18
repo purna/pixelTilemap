@@ -77,6 +77,18 @@ const ToolManager = {
             });
         }
 
+        // Eraser type buttons
+        document.querySelectorAll('.eraser-type-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                State.eraserType = btn.dataset.eraser || 'hard';
+                this.updateEraserTypeButtons();
+                if (State.eraserType !== 'spray' && typeof TilemapCore !== 'undefined' && TilemapCore.stopSpray) {
+                    TilemapCore.stopSpray();
+                }
+            });
+        });
+        this.updateEraserTypeButtons();
+
         // Attach preset button listeners
         this.attachPresetButtonListeners();
     },
@@ -208,11 +220,15 @@ const ToolManager = {
             TilemapCore.stopSpray();
         }
 
-        // Spray-only options
-        const sprayOptions = document.getElementById('spray-options');
-        if (sprayOptions) {
-            sprayOptions.classList.toggle('hidden', tool !== 'spray');
+        // Spray options also apply to the spray eraser type.
+        this.updateSprayOptionVisibility();
+
+        // Eraser-only options
+        const eraserOptions = document.getElementById('eraser-options');
+        if (eraserOptions) {
+            eraserOptions.classList.toggle('hidden', tool !== 'eraser');
         }
+        this.updateEraserTypeButtons();
 
         // Selecting a drawing tool leaves the Layers/Canvas/Tilemap views.
         // This also covers keyboard shortcuts, not just mouse clicks.
@@ -246,6 +262,21 @@ const ToolManager = {
         DOM.elements.toolButtons.forEach(button => {
             button.classList.toggle('active', button.dataset.tool === State.currentTool);
         });
+    },
+
+    updateEraserTypeButtons() {
+        document.querySelectorAll('.eraser-type-btn').forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.eraser === State.eraserType);
+        });
+        this.updateSprayOptionVisibility();
+    },
+
+    updateSprayOptionVisibility() {
+        const sprayOptions = document.getElementById('spray-options');
+        if (!sprayOptions) return;
+        const showSprayOptions = State.currentTool === 'spray'
+            || (State.currentTool === 'eraser' && State.eraserType === 'spray');
+        sprayOptions.classList.toggle('hidden', !showSprayOptions);
     },
 
     updateActivePresetButton(size) {
@@ -365,7 +396,8 @@ const ToolManager = {
                 this.showToolOptionsPanel(false);
                 break;
             case 'eraser':
-                this.showToolOptionsPanel(false); // Show brush sizes and opacity
+                this.showPalettePanel(); // Keep colours visible for shift-erasing / next tool
+                this.showToolOptionsPanel(false);
                 break;
             case 'eyedropper':
                 this.showPalettePanel();
@@ -470,7 +502,7 @@ const ToolManager = {
             pencil: 'Draw with a single pixel at a time.',
             brush: 'Paint with the selected color. Left click to paint, right click to erase.',
             spray: 'Spray dither particles over an area. Adjust size, density and opacity variation.',
-            eraser: 'Remove pixels from the canvas. Left click to erase, right click to paint.',
+            eraser: 'Remove pixels with a hard, soft or spray eraser. Hold Shift with any tool for a quick hard erase.',
             eyedropper: 'Pick a color from the canvas by clicking on it.'
         };
         return descriptions[tool] || 'Unknown tool';

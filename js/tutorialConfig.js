@@ -107,7 +107,7 @@ class TutorialConfig {
                         arrowPosition: 'none',
                         marginOverride: '10px',
                         heading: 'Pro Tips for Perfect Tiles',
-                        content: '• Use the Color Picker (I) to sample colors from your artwork\n• Hold Shift while drawing for straight lines\n• Toggle layers to create complex patterns\n• Remember: seamless tiles work best with symmetrical designs\n• Export at higher resolutions for crisp game textures',
+                        content: '• Use the Color Picker (I) to sample colors from your artwork\n• Hold Shift with any tool for a quick hard erase\n• Toggle layers to create complex patterns\n• Remember: seamless tiles work best with symmetrical designs\n• Export at higher resolutions for crisp game textures',
                         showNext: false,
                         showSkip: true
                     }

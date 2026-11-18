@@ -114,6 +114,9 @@ const FileManager = {
             if (data.settings.sprayUsePalette !== undefined) {
                 State.sprayUsePalette = !!data.settings.sprayUsePalette;
             }
+            if (data.settings.eraserType) {
+                State.eraserType = data.settings.eraserType;
+            }
             if (data.settings.currentColor) {
                 State.setColor(data.settings.currentColor);
                 DOM.elements.colorPicker.value = data.settings.currentColor;
@@ -150,6 +153,7 @@ const FileManager = {
                 sprayDensity: State.sprayDensity,
                 sprayOpacityVariation: State.sprayOpacityVariation,
                 sprayUsePalette: State.sprayUsePalette,
+                eraserType: State.eraserType,
                 currentColor: State.currentColor,
                 canvasSize: { width: Config.CANVAS_SIZE, height: Config.CANVAS_SIZE },
                 tileDim: Config.TILE_DIM,

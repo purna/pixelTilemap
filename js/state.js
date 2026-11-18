@@ -10,6 +10,7 @@ const State = {
     sprayDensity: 50,
     sprayOpacityVariation: 0.5,
     sprayUsePalette: false,
+    eraserType: 'hard',
     
     // Canvas state
     isDrawing: false,
@@ -371,6 +372,11 @@ const State = {
 
         const sprayUsePalette = document.getElementById('sprayUsePalette');
         if (sprayUsePalette) sprayUsePalette.checked = this.sprayUsePalette;
+
+        // Eraser type buttons
+        document.querySelectorAll('.eraser-type-btn').forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.eraser === this.eraserType);
+        });
         
         // Update panel visibility
         const layersPanel = document.getElementById('panel-layers');

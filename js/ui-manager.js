@@ -256,8 +256,8 @@ const UIManager = {
                 break;
 
             case 'eraser':
-                // Eraser needs Size (Options) but not Palette
-                this.showPanelSections(['panel-tool-options']);
+                // Keep the palette visible while erasing.
+                this.showPanelSections(['panel-palette', 'panel-tool-options']);
                 break;
 
             case 'eyedropper':
