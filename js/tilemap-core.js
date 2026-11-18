@@ -183,15 +183,23 @@ const TilemapCore = {
         
         ctx.save();
 
-        // Soft eraser lowers pixel alpha instead of clearing it outright.
-        if (color === 'transparent' && State.currentTool === 'eraser' && State.eraserType === 'soft') {
+        // Soft and spray erasers lower pixel alpha instead of clearing it
+        // outright, so they behave like a reverse spray can. A right-click
+        // spray also uses this path, giving a dithered transparent spray.
+        const sprayErase = color === 'transparent'
+            && (State.currentTool === 'spray'
+                || (State.currentTool === 'eraser' && State.eraserType === 'spray'));
+        const softErase = color === 'transparent'
+            && State.currentTool === 'eraser' && State.eraserType === 'soft';
+        if (sprayErase || softErase) {
             ctx.globalCompositeOperation = 'destination-out';
-            if (brushRadius > 0) {
+            if (softErase && brushRadius > 0) {
                 const maxDistance = brushRadius + 1;
                 const normalizedDistance = distanceFromCenter / maxDistance;
                 const edgeAlpha = Math.max(0.1, 1.0 - (normalizedDistance * 0.8));
                 ctx.globalAlpha = opacity * edgeAlpha;
             } else {
+                // Spray already supplies a per-particle opacity.
                 ctx.globalAlpha = opacity;
             }
             ctx.fillStyle = '#000';
@@ -248,7 +256,11 @@ const TilemapCore = {
         const radius = Math.max(1, Math.round(State.brushSize));
         const density = Math.max(0.01, Math.min(1, (State.sprayDensity ?? 50) / 100));
         const variation = Math.max(0, Math.min(1, State.sprayOpacityVariation));
-        const erasing = State.currentBrush === Config.ERASE_COLOR;
+        // The eraser tool always erases, even before the first mousedown has
+        // updated the brush; a transparent brush also erases for right-click
+        // spray strokes.
+        const erasing = State.currentTool === 'eraser'
+            || State.currentBrush === Config.ERASE_COLOR;
 
         let colors;
         if (erasing) {

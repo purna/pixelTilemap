@@ -82,6 +82,15 @@ const ToolManager = {
             btn.addEventListener('click', () => {
                 State.eraserType = btn.dataset.eraser || 'hard';
                 this.updateEraserTypeButtons();
+                // The spray eraser uses the same 3×3 minimum as the spray can.
+                const sprayActive = State.currentTool === 'spray'
+                    || (State.currentTool === 'eraser' && State.eraserType === 'spray');
+                if (DOM.elements.brushSizeSlider) {
+                    DOM.elements.brushSizeSlider.min = sprayActive ? '1' : '0';
+                }
+                if (sprayActive && State.brushSize < 1) {
+                    this.setBrushSize(1);
+                }
                 if (State.eraserType !== 'spray' && typeof TilemapCore !== 'undefined' && TilemapCore.stopSpray) {
                     TilemapCore.stopSpray();
                 }
@@ -193,11 +202,13 @@ const ToolManager = {
             }
         });
 
-        // Spray works on a 3×3 logical-pixel minimum.
+        // Spray works on a 3×3 logical-pixel minimum, including the spray eraser.
+        const sprayActive = tool === 'spray'
+            || (tool === 'eraser' && State.eraserType === 'spray');
         if (DOM.elements.brushSizeSlider) {
-            DOM.elements.brushSizeSlider.min = tool === 'spray' ? '1' : '0';
+            DOM.elements.brushSizeSlider.min = sprayActive ? '1' : '0';
         }
-        if (tool === 'spray' && State.brushSize < 1) {
+        if (sprayActive && State.brushSize < 1) {
             this.setBrushSize(1);
         }
 
