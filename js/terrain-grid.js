@@ -86,6 +86,19 @@ const TerrainGrid = {
             });
         }
 
+        const grassBtn = document.getElementById('terrain-grass-btn');
+        if (grassBtn) {
+            grassBtn.addEventListener('click', () => {
+                this.cells = [
+                    [1, 1, 1],
+                    [1, 1, 1],
+                    [1, 1, 1]
+                ];
+                this.render();
+                this.save();
+            });
+        }
+
         const clearBtn = document.getElementById('terrain-clear-btn');
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
@@ -97,6 +110,58 @@ const TerrainGrid = {
                 this.render();
                 this.save();
             });
+        }
+
+        const applyBtn = document.getElementById('terrain-apply-btn');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => this.applyToCanvas());
+        }
+    },
+
+    applyToCanvas() {
+        if (typeof State === 'undefined' || typeof DOM === 'undefined') return;
+        if (!confirm('Replace the current canvas with this 3×3 terrain sample?')) return;
+
+        const composite = document.createElement('canvas');
+        composite.width = this.TILE * 3;
+        composite.height = this.TILE * 3;
+        const compositeCtx = composite.getContext('2d');
+
+        for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 3; col++) {
+                const tileCanvas = document.createElement('canvas');
+                tileCanvas.width = this.TILE;
+                tileCanvas.height = this.TILE;
+                this.drawTile(tileCanvas.getContext('2d'), row, col);
+                compositeCtx.drawImage(tileCanvas, col * this.TILE, row * this.TILE);
+            }
+        }
+
+        // Clear every layer so the sample is shown by itself, then paint it
+        // on the active layer.
+        State.layers.forEach(layer => {
+            layer.canvas.getContext('2d').clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+        });
+
+        if (State.layers.length === 0) {
+            State.addLayer('Layer 1');
+        }
+
+        const targetLayer = State.layers[State.activeLayerIndex] || State.layers[0];
+        const targetCtx = targetLayer.canvas.getContext('2d');
+        targetCtx.save();
+        targetCtx.imageSmoothingEnabled = false;
+        targetCtx.clearRect(0, 0, targetLayer.canvas.width, targetLayer.canvas.height);
+        targetCtx.drawImage(composite, 0, 0, targetLayer.canvas.width, targetLayer.canvas.height);
+        targetCtx.restore();
+
+        if (typeof LayerManager !== 'undefined') LayerManager.renderLayers();
+        if (typeof TilemapCore !== 'undefined') TilemapCore.updatePreviews();
+        State.markUnsaved();
+        if (typeof State.saveState === 'function') State.saveState();
+
+        if (typeof Notifications !== 'undefined') {
+            new Notifications().success('Terrain sample loaded into the canvas');
         }
     },
 
@@ -203,6 +268,22 @@ const TerrainGrid = {
             const d = Math.sqrt((size - 1 - x) ** 2 + (size - 1 - y) ** 2);
             if (d < 15 + this.hash(worldX + 3, worldY + 3) * 3) band = Math.max(band, 16 - d);
         }
+
+        // Diagonal dirt neighbours create the small inner corner wedges.
+        // This is what makes a grass tile surrounded by grass but touching
+        // dirt diagonally show dirt in its four corners.
+        const diagonals = [
+            { dr: -1, dc: -1, cx: 0, cy: 0 },
+            { dr: -1, dc: 1, cx: size - 1, cy: 0 },
+            { dr: 1, dc: -1, cx: 0, cy: size - 1 },
+            { dr: 1, dc: 1, cx: size - 1, cy: size - 1 }
+        ];
+        diagonals.forEach(diagonal => {
+            if (!this.isDirt(row + diagonal.dr, col + diagonal.dc)) return;
+            const d = Math.sqrt((x - diagonal.cx) ** 2 + (y - diagonal.cy) ** 2);
+            const cornerEdge = 11 + this.hash(worldX + diagonal.dc, worldY + diagonal.dr) * 3;
+            if (d < cornerEdge) band = Math.max(band, cornerEdge - d);
+        });
 
         return band;
     },

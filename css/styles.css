@@ -3153,3 +3153,15 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .terrain-grid-credit a:hover { text-decoration: underline; }
+
+.terrain-grid-actions .btn.compact {
+    flex: 1 1 calc(50% - 5px);
+}
+
+.terrain-apply-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 1px;
+    font-size: 0.72rem;
+    padding: 8px 10px;
+}

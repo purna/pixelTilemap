@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
     <!-- Local Font Awesome Implementation -->
     <link rel="stylesheet" href="fonts/fontawesome-free-6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=5">
+    <link rel="stylesheet" href="css/styles.css?v=6">
     <link rel="stylesheet" href="css/tutorials.css">
      <!-- Custom Fonts -->
     <style>
@@ -341,10 +341,16 @@
                         <button type="button" class="btn compact" id="terrain-invert-btn" title="Swap grass and dirt">
                             <i class="fas fa-arrows-rotate"></i> Invert
                         </button>
+                        <button type="button" class="btn compact" id="terrain-grass-btn" title="Fill the grid with grass">
+                            <i class="fas fa-square" style="color:#6fbd27"></i> Grass
+                        </button>
                         <button type="button" class="btn compact" id="terrain-clear-btn" title="Fill the grid with dirt">
-                            <i class="fas fa-square"></i> Dirt
+                            <i class="fas fa-square" style="color:#c68b52"></i> Dirt
                         </button>
                     </div>
+                    <button type="button" class="btn primary terrain-apply-btn" id="terrain-apply-btn" title="Replace the active canvas with this terrain grid">
+                        <i class="fas fa-paint-brush"></i> Load to Canvas
+                    </button>
                     <div class="terrain-grid-legend">
                         <span><i class="terrain-legend-swatch grass"></i> Grass</span>
                         <span><i class="terrain-legend-swatch dirt"></i> Dirt</span>
@@ -651,36 +657,36 @@
     </div>
 
     <!-- Core modules -->
-    <script src="js/config.js?v=5"></script>
-    <script src="js/state.js?v=5"></script>
-    <script src="js/dom.js?v=5"></script>
+    <script src="js/config.js?v=6"></script>
+    <script src="js/state.js?v=6"></script>
+    <script src="js/dom.js?v=6"></script>
     <script src="js/notifications.js"></script>
 
     <!-- UI Components -->
-    <script src="js/tooltip.js?v=5"></script>
+    <script src="js/tooltip.js?v=6"></script>
 
     <!-- Specialized modules -->
-    <script src="js/tilemap-core.js?v=5"></script>
-    <script src="js/palette-manager.js?v=5"></script>
-    <script src="js/layer-manager.js?v=5"></script>
-    <script src="js/tool-manager.js?v=5"></script>
-    <script src="js/file-manager.js?v=5"></script>
-    <script src="js/terrain-grid.js?v=5"></script>
-    <script src="js/tilemap-manager.js?v=5"></script>
-    <script src="js/tile-library.js?v=5"></script>
-    <script src="js/settings-manager.js?v=5"></script>
-    <script src="js/zoom-manager.js?v=5"></script>
+    <script src="js/tilemap-core.js?v=6"></script>
+    <script src="js/palette-manager.js?v=6"></script>
+    <script src="js/layer-manager.js?v=6"></script>
+    <script src="js/tool-manager.js?v=6"></script>
+    <script src="js/file-manager.js?v=6"></script>
+    <script src="js/terrain-grid.js?v=6"></script>
+    <script src="js/tilemap-manager.js?v=6"></script>
+    <script src="js/tile-library.js?v=6"></script>
+    <script src="js/settings-manager.js?v=6"></script>
+    <script src="js/zoom-manager.js?v=6"></script>
     <script src="js/tutorialConfig.js"></script>
     <script src="js/tutorialSystem.js"></script>
 
     <!-- Input handling -->
-    <script src="js/input-handler.js?v=5"></script>
-    <script src="js/ui-manager.js?v=5"></script>
+    <script src="js/input-handler.js?v=6"></script>
+    <script src="js/ui-manager.js?v=6"></script>
 
     <!-- Main application -->
-    <script src="js/app.js?v=5"></script>
-    <script src="js/ai-provider.js?v=5" data-app-id="pixelTilemap"></script>
-    <script src="js/ai-creator.js?v=5" data-app-id="pixelTilemap"></script>
+    <script src="js/app.js?v=6"></script>
+    <script src="js/ai-provider.js?v=6" data-app-id="pixelTilemap"></script>
+    <script src="js/ai-creator.js?v=6" data-app-id="pixelTilemap"></script>
 </body>
 
 </html>
