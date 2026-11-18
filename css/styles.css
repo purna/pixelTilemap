@@ -167,6 +167,10 @@ button {
     margin-right: 0;
 }
 
+.main-container.panel-closed .controls-container {
+    max-width: none;
+}
+
 /* LEFT TOOLBAR */
 .toolbar {
     width: 80px;
@@ -365,8 +369,10 @@ button {
     text-align: center;
     margin-bottom: 15px;
     color: var(--accent-primary);
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Inter', sans-serif;
     font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
 }
 
 .controls-row {
@@ -428,7 +434,7 @@ button {
 /* FLOATING BRUSH CONTROLS OVERLAY */
 .brush-controls-overlay {
     position: fixed;
-    bottom: 10px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
@@ -438,12 +444,30 @@ button {
     /* Indicate it's draggable */
 }
 
+.brush-controls-overlay .grippy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: move;
+    margin-right: 2px;
+    color: #cccccc;
+    text-shadow: 1px 0 1px rgba(0, 0, 0, 0.6);
+    opacity: 0.85;
+}
+
+.brush-controls-overlay .grippy::before {
+    content: '\f58e';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 14px;
+}
+
 .brush-controls-overlay .brush-controls {
     background: rgba(26, 26, 46, 0.95);
     backdrop-filter: blur(8px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 12px 16px;
+    padding: 12px 52px 12px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -452,6 +476,7 @@ button {
     /* Enable interactions */
     white-space: nowrap;
     position: relative;
+    min-width: 500px;
 }
 
 /* Drag handle indicator - right side only */
@@ -464,36 +489,13 @@ button {
     width: 40px;
     cursor: move;
     user-select: none;
-
-    background-image: radial-gradient(
-    circle at center,
-    rgb(255, 255, 255) -0.05rem,
-    transparent 0
-  );
-
+    background-image: radial-gradient(circle at center,
+            rgb(255, 255, 255) -0.05rem,
+            transparent 0);
     background-repeat: repeat;
     background-position: center;
     opacity: 0.7;
     z-index: 10;
-}
-
-/* Make the brush controls longer and add right padding for opacity control */
-.brush-controls-overlay .brush-controls {
-    background: rgba(26, 26, 46, 0.95);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px 16px 12px 16px;
-    padding-right: 140px; /* Extra space for opacity control */
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    pointer-events: auto;
-    /* Enable interactions */
-    white-space: nowrap;
-    position: relative;
-    min-width: 500px; /* Make it longer */
 }
 
 .brush-controls-overlay label {
@@ -509,11 +511,19 @@ button {
 }
 
 .brush-controls-overlay .brush-size-display {
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Inter', sans-serif;
     font-size: 10px;
     color: var(--accent-tertiary);
     min-width: 45px;
     text-align: center;
+    font-weight: normal;
+}
+
+.brush-controls-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
 }
 
 .brush-controls-overlay .preset-sizes {
@@ -557,22 +567,28 @@ canvas {
 /* RIGHT PANEL */
 .right-panel {
     width: 300px;
+    min-width: 300px;
     background: var(--bg-dark);
     border-left: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     z-index: 15;
     position: relative;
-    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s ease, margin-right 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) var(--bg-dark);
+    transform: translateX(0);
+    opacity: 1;
 }
 
 
 .right-panel.closed {
-    display: none;
+    transform: translateX(100%);
+    opacity: 0;
+    margin-right: -300px;
     border-left: none;
+    pointer-events: none;
 }
 
 .panel-section {
