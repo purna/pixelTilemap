@@ -321,11 +321,6 @@ const TileAtlas = {
             return false;
         };
 
-        const il = Math.floor(size / 2);
-        const ir = size - il;
-        const it = il;
-        const ib = ir;
-
         for (let y = 0; y < size; y++) {
             for (let x = 0; x < size; x++) {
                 const index = y * size + x;
@@ -343,11 +338,6 @@ const TileAtlas = {
                         color = pack.fillLight;
                     } else if (h < 0.035) {
                         color = pack.fillDark;
-                    }
-
-                    // Soft rounded outer corners.
-                    if ((x < it || x >= ir || y < it || y >= ib) && h > 0.8) {
-                        color = pack.edgeLight;
                     }
                 } else {
                     color = this.pick(pack.base, Math.floor(h * pack.base.length));
